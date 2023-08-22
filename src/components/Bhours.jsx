@@ -44,9 +44,7 @@ const Bhours = () => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <div>
-            
-          </div>
+         
           <div className="flex justify-between ">
          
             <h1 className="text-[22px] text-[#0C1A97]">Business Hours</h1>

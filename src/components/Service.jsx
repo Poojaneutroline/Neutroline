@@ -6,6 +6,7 @@ import view from "../assets/icons-view.png";
 import trash from "../assets/icons-trash.png";
 import Modal from "react-responsive-modal";
 import AddService from "./AddService";
+import AddNewService from "./AddNewService";
 import "./service.css";
 
 const Service = () => {
@@ -105,6 +106,7 @@ const Service = () => {
     // Update the data array with the updatedData
     setData(updatedData);
   };
+  
 
   return (
     <div>
@@ -118,7 +120,7 @@ const Service = () => {
           closeButton: "customButton",
         }}
       >
-        <AddService
+        <AddNewService
           setData={setData}
           data={data}
           setOpenModal={openAddModal}
@@ -142,7 +144,7 @@ const Service = () => {
         )}
       </Modal>
       <div className="flex justify-between items-end">
-        <h1 className="text-[22px] text-[#0C1A97] pl-5 mb-[-5px]">
+        <h1 className="text-[22px] text-[#0C1A97]  mb-[-5px]">
           All Services
         </h1>
         <button
@@ -182,7 +184,7 @@ const Service = () => {
                         day.trim() !== "" && (
                           <button
                             key={index}
-                            className=" flex w-[30px] h-[32px] p-[7px 9px 7px 9px] justify-center items-center border  bg-[#FEFEFF] text-[#5B76FC]  rounded-lg "
+                            className=" flex w-[30px] h-[32px] p-[7px 9px 7px 9px] justify-center items-center border  bg-[#FEFEFF] text-[#5B76FC]  rounded-lg cursor-default "
                           >
                             {getDayLabel(day)}
                           </button>
@@ -239,6 +241,7 @@ const Service = () => {
           </table>
         </div>
       </div>
+      
     </div>
   );
 };

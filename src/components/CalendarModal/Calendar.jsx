@@ -16,7 +16,7 @@ export default function CalendarDiwash({ onSelectDate }) {
 
     const selectedMomentDate = moment(dateState);
 
-    const date = selectedMomentDate.format("YYYY/MM/D");
+    const date = selectedMomentDate.format("MM/D");
     onSelectDate(date);
   }
 

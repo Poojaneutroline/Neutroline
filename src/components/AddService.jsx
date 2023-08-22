@@ -23,6 +23,7 @@ const AddService = ({ setData, data, setOpenModal, handleToggle }) => {
     ],
     visibility: false,
   });
+  const [show, setShow] = useState(true);
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -53,7 +54,11 @@ const AddService = ({ setData, data, setOpenModal, handleToggle }) => {
     setData((prevState) => [...prevState, newService]);
     setOpenModal(false);
   };
-
+  const [selectedOption, setSelectedOption] = useState("custom");
+  const handleOptionChange = (e) => {
+    setSelectedOption(e.target.value);
+   
+  };
   const handleDuration = () => {
     return newService.duration.map((option) => (
       <option key={option} value={option}>
@@ -82,8 +87,7 @@ const AddService = ({ setData, data, setOpenModal, handleToggle }) => {
   const renderTimeSelect = (day) => {
     if (!showTimeSelect[day]) return null;
     return (
-      
-      <div className="flex items-center gap-2  px-3   " >
+      <div className="flex items-center gap-2  px-3   ">
         <label className="w-[40px]">{day} </label>
         <select name="" id="">
           <option value="">Select</option>
@@ -97,19 +101,10 @@ const AddService = ({ setData, data, setOpenModal, handleToggle }) => {
           <option value="">10:00 AM</option>
           <option value="">11:00 AM</option>
         </select>
-       
       </div>
     );
   };
-  const daysOfWeek = [
-    "Mon",
-    "Tue",
-    "Wed",
-    "Thu",
-    "Fri",
-    "Sat",
-    "Sun",
-  ];
+  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   return (
     <div className="bg-[#e9edf5] w-[500px]  flex flex-col gap-4 px-6 py-4 rounded-md">
@@ -130,47 +125,81 @@ const AddService = ({ setData, data, setOpenModal, handleToggle }) => {
         </label>
       </div>
       <div className="flex gap-2 ">
-        <div className="flex flex-col"> 
+        
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between">
           <label>Availability</label>
-          <div className="bg-[#dceaff4d] flex flex-col">
-
-          <div className=" flex p-1 rounded-[5px] px-5 mt-2 gap-4 ">
-            {daysOfWeek.map((day) => (
-              <div className="flex " key={day}>
-                <input
-                  type="checkbox"
-                  name={day}
-                  checked={newService.availability[day]}
-                  onChange={handleChange}
-                  style={{ backgroundColor: "#A8CCD1" }}
-                  onClick={() => handleToggleTimeSelect(day)}
-                />
-                <label className="p-1 text-[#575757] text-[15px]">{day}</label>
-              </div>
-            ))}
-            
-          </div>
-          <div className="max-h-[50px] overflow-y-auto ">
-          <div className="flex flex-col gap-2 items-center justify-center ">
-        {renderTimeSelect("Mon")}
-        {renderTimeSelect("Tue")}
-        {renderTimeSelect("Wed")}
-        {renderTimeSelect("Thu")}
-        {renderTimeSelect("Fri")}
-        {renderTimeSelect("Sat")}
-        {renderTimeSelect("Sun")}
-      </div>
-      </div>
-      </div>
-
+          <div className="flex items-center mr-5 gap-3 mt-5 ">
+        <div>
+          <label className="inline-flex items-center">
+            <input
+              type="radio"
+              value="default"
+              checked={selectedOption === "default"}
+              onChange={handleOptionChange}
+              className="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out "
+            />
+            <span className="ml-2 text-[14px] text-[#0C1A97] font-normal">
+              Default
+            </span>
+          </label>
+        </div>
+        <div>
+          <label className="inline-flex items-center">
+            <input
+              type="radio"
+              value="custom"
+              checked={selectedOption === "custom"}
+              onChange={handleOptionChange}
+              className="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out "
+            />
+            <span className="ml-2 text-[14px] text-[#0C1A97] font-normal">
+              Custom
+            </span>
+          </label>
         </div>
 
-        <div></div>
+        {/* {selectedWeekday && <p>Selected weekday: {selectedWeekday}</p>} */}
       </div>
-     
+          </div>
+         
+          <div className="bg-[#dceaff4d] flex flex-col">
+            <div className=" flex p-1 rounded-[5px] px-5 mt-2 gap-4 ">
+              {daysOfWeek.map((day) => (
+                <div className="flex " key={day}>
+                  <input
+                    type="checkbox"
+                    name={day}
+                    checked={newService.availability[day]}
+                    onChange={handleChange}
+                    style={{ backgroundColor: "#A8CCD1" }}
+                    onClick={() => handleToggleTimeSelect(day)}
+                  />
+                  <label className="p-1 text-[#575757] text-[15px]">
+                    {day}
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            <div className={` overflow-y-auto   `} style={{ height: "70px" }}>
+              <div className="flex flex-col gap-2 items-center justify-center ">
+                {renderTimeSelect("Mon")}
+                {renderTimeSelect("Tue")}
+                {renderTimeSelect("Wed")}
+                {renderTimeSelect("Thu")}
+                {renderTimeSelect("Fri")}
+                {renderTimeSelect("Sat")}
+                {renderTimeSelect("Sun")}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
       <div className="flex justify-between items-center ">
         <div className="flex items-center gap-3">
-          {" "}
           <label>Visibility</label>
           <div className="relative">
             {/* Hidden input to hold the toggle state */}

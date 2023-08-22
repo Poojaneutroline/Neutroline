@@ -1,12 +1,23 @@
-.react-responsive-modal-closeButton {
-    top: 20px !important;
-    right: 8px;
-    padding: 10px;
-    width:40px;
-  
-   
-  }
-  .customModal {
-    background:none;
-    padding:0;
-  }
+
+.customModal {
+  background: none;
+  padding: 0;
+}
+.customButton2{
+   top: 20px !important;
+  right: 8px;
+  padding: 10px;
+  width: 40px;
+}
+.customButton{
+   top: 10px !important;
+  right: 8px;
+  padding: 10px;
+  width: 40px;
+}
+/* .react-responsive-modal-closeButton {
+  top: 10px !important;
+  right: 8px;
+  padding: 10px;
+  width: 40px;
+} */

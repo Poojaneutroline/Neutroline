@@ -99,6 +99,23 @@ const AddOffersModal = ({ setGetformData, closeModal }) => {
    }));
  };
 
+ const [fromModalOpen, setFromModalOpen] = useState(false);
+
+  const fromOpenModal = () => {
+    setFromModalOpen(true);
+  };
+  const onFromCloseModal = () => setFromModalOpen(false);
+
+  const handleFromSelectedDate = (selectedDate) => {
+    // Callback function to set the selected date in the formData state
+    setFormData((prevState) => ({
+      ...prevState,
+      from: selectedDate, // Update the "date" field with the selected date
+    }));
+
+    setFromModalOpen(false);
+  };
+
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -131,6 +148,18 @@ const AddOffersModal = ({ setGetformData, closeModal }) => {
       >
         <Calendar onSelectDate={handleSelectedDate} />
       </Modal>
+      <Modal
+        open={fromModalOpen}
+        onClose={onFromCloseModal}
+        center
+        classNames={{
+          overlay: "customOverlay",
+          modal: "customModal",
+          closeButton: "customButton",
+        }}
+      >
+        <Calendar onSelectDate={handleFromSelectedDate} />
+      </Modal>
       <div>
         <form
           onSubmit={handleSubmit}
@@ -142,7 +171,7 @@ const AddOffersModal = ({ setGetformData, closeModal }) => {
           <div className="flex items-center relative mx-3">
             {/* <img className="w-3.5  absolute left-4" src={user} alt="user"></img> */}
             <input
-              className={`w-full rounded-[5px]  text-[14px] h-[39px] m-2 pl-[20px] border-[0.5px]   focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-500  placeholder:text-[#8B8989] bg-[#dceaff4d]   placeholder:text-[13px]  md:w-[400px] md:h-[45px] md:placeholder:text-[15px] md:pl-[20px]`}
+              className={`w-full rounded-[5px]  text-[14px] h-[39px] m-2 pl-[20px] border-[0.5px]   focus:bg-white focus:outline-none focus:ring-0.5 focus:ring-slate-500  placeholder:text-[#8B8989] bg-[#dceaff4d]   placeholder:text-[13px]  md:w-[400px] md:h-[45px] md:placeholder:text-[15px] md:pl-[20px]`}
               type="text"
               name="title"
               value={formData.title}
@@ -150,16 +179,16 @@ const AddOffersModal = ({ setGetformData, closeModal }) => {
               placeholder="Title"
               required
             />
-            {/* {formErrors.name && (
+            {formErrors.title && (
           <p className="text-red-500  absolute right-2 text-[12px] mx-3 ">
-            {formErrors.name}*
+            {formErrors.title}*
           </p>
-        )} */}
+        )}
           </div>
           <div className="flex  items-center relative mx-3">
             {/* <img className="w-4 absolute left-4" src={mail} alt="mail"></img> */}
             <input
-              className={`w-full  rounded-[5px]  text-[14px] h-[39px] m-2 pl-[26px] border-[0.5px]   focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-500  placeholder:text-[#8B8989] bg-[#dceaff4d]   placeholder:text-[13px]  md:w-[400px] md:h-[45px] md:placeholder:text-[15px] md:pl-[20px]`}
+              className={`w-full  rounded-[5px]  text-[14px] h-[39px] m-2 pl-[26px] border-[0.5px]   focus:bg-white focus:outline-none focus:ring-0.5 focus:ring-slate-500  placeholder:text-[#8B8989] bg-[#dceaff4d]   placeholder:text-[13px]  md:w-[400px] md:h-[45px] md:placeholder:text-[15px] md:pl-[20px]`}
               type="text"
               name="message"
               value={formData.message}
@@ -167,11 +196,11 @@ const AddOffersModal = ({ setGetformData, closeModal }) => {
               placeholder="Message"
               required
             />
-            {/* {formErrors.email && (
+            {formErrors.message && (
           <p className="text-red-500  absolute right-2 text-[12px] mx-3 ">
-            {formErrors.email}*
+            {formErrors.message}*
           </p>
-        )} */}
+        )}
           </div>
           <div className="flex items-center relative mx-3">
             {/* <img
@@ -180,7 +209,7 @@ const AddOffersModal = ({ setGetformData, closeModal }) => {
           alt="phone"
         ></img> */}
             <textarea
-              className={`w-full rounded-[5px] md:p-2 text-[14px] h-[39px] m-2 pl-[26px] border-[0.5px]   focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-500  placeholder:text-[#8B8989] bg-[#dceaff4d] shadow-shado2  placeholder:text-[13px]  md:w-[400px] md:h-auto md:placeholder:text-[15px] md:pl-[20px] resize-none`}
+              className={`w-full rounded-[5px] md:p-2 text-[14px] h-[39px] m-2 pl-[26px] border-[0.5px]   focus:bg-white focus:outline-none focus:ring-0.5 focus:ring-slate-500  placeholder:text-[#8B8989] bg-[#dceaff4d] shadow-shado2  placeholder:text-[13px]  md:w-[400px] md:h-auto md:placeholder:text-[15px] md:pl-[20px] resize-none`}
               rows={4}
               name="description"
               placeholder="Description"
@@ -188,40 +217,35 @@ const AddOffersModal = ({ setGetformData, closeModal }) => {
               onChange={handleChange}
               required
             />
-            {/* {formErrors.contact && (
+            {formErrors.description && (
           <p className="text-red-500  absolute right-2 text-[12px] mx-3 ">
-            {formErrors.contact}*
+            {formErrors.description}*
           </p>
-        )} */}
+        )}
           </div>
 
           <div className="  mx-3 flex  flex-col md:justify-between md:items-center md:gap-2 md:flex-row  ">
-            <div className=" relative w-[100px] md:w-auto ">
+          <div className=" relative w-[100px] md:w-auto ">
               {/* <img
-            className=" hidden md:block md:w-4 left-2 absolute md:left-4 top-[1.40rem]"
-            src={calender}
-            alt="calender"
+            className=" hidden md:block  md:w-4 left-2 absolute md:left-4 top-[1.40rem]"
+            src={time}
+            alt="time"
           ></img> */}
-              <input
-                type="text"
+              <button
+                type="button"
+                onClick={fromOpenModal}
                 name="from"
-                value={formData.from}
-                placeholder="From"
-                className="md:pl-[20px] text-[14px] h-[39px] w-full rounded-[5px] text-[#8B8989] m-2 border-[0.5px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-500 bg-[#dceaff4d]  md:w-[170px] md:h-[45px] md:text-[15px]"
-                onChange={handleChange}
-              />
+                className="  text-[14px]  h-[39px]  w-full rounded-[5px]  text-[#8B8989]  m-2  border-[0.5px]  focus:bg-white focus:outline-none focus:ring-0.5 focus:ring-slate-500  bg-[#dceaff4d] shadow-shado2   md:w-[170px] md:h-[45px]  md:text-[15px] "
+              >
+                {formData.from === "" ? <p>From</p> : <p>{formData.from}</p>}
+              </button>
 
-              {/* {formData.date === "" ? (
-              <p>Select Date</p>
-            ) : (
-              <p className="pl-3">{formData.date}</p>
-            )} */}
-
-              {/* {formErrors.date && (
+             
+              {formErrors.from && (
             <p className="text-red-500 text-[12px] mx-3 ">
-              {formErrors.date}*
+              {formErrors.from}*
             </p>
-          )} */}
+          )}
             </div>
             {/* <div className=" relative w-[100px] md:w-auto ">
          
@@ -243,22 +267,16 @@ const AddOffersModal = ({ setGetformData, closeModal }) => {
                 type="button"
                 onClick={openModal}
                 name="to"
-                className="  text-[14px]  h-[39px]  w-full rounded-[5px]  text-[#8B8989]  m-2  border-[0.5px]  focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-500  bg-[#dceaff4d] shadow-shado2   md:w-[170px] md:h-[45px]  md:text-[15px] "
+                className="  text-[14px]  h-[39px]  w-full rounded-[5px]  text-[#8B8989]  m-2  border-[0.5px]  focus:bg-white focus:outline-none focus:ring-0.5 focus:ring-slate-500  bg-[#dceaff4d] shadow-shado2   md:w-[170px] md:h-[45px]  md:text-[15px] "
               >
                 {formData.to === "" ? <p>To</p> : <p>{formData.to}</p>}
               </button>
 
-              {/* {formData.date === "" ? (
-              <p>Select Date</p>
-            ) : (
-              <p className="pl-3">{formData.date}</p>
-            )} */}
-
-              {/* {formErrors.time && (
-            <p className="text-red-500 text-[12px] mx-3 ">
-              {formErrors.time}*
+              {formErrors.to && (
+            <p className={`text-red-500 text-[12px] mx-3`}>
+              {formErrors.to}*
             </p>
-          )} */}
+          )}
             </div>
           </div>
           {/* <div
