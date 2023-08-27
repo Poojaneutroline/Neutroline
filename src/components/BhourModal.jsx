@@ -36,6 +36,19 @@ function BhourModal({ setOpenModal }) {
       acc[`${day.toLowerCase()}BreakTo`] = defaultBreakTo;
       return acc;
     }, {});
+  //   if (day === "Sat" || day === "Sun") {
+  //     acc[`${day.toLowerCase()}WorkHoursFrom`] = "Select";
+  //     acc[`${day.toLowerCase()}WorkHoursTo`] = "Select";
+  //     acc[`${day.toLowerCase()}BreakFrom`] = "Select";
+  //     acc[`${day.toLowerCase()}BreakTo`] = "Select";
+  //   } else {
+  //     acc[`${day.toLowerCase()}WorkHoursFrom`] = defaultWorkHoursFrom;
+  //     acc[`${day.toLowerCase()}WorkHoursTo`] = defaultWorkHoursTo;
+  //     acc[`${day.toLowerCase()}BreakFrom`] = defaultBreakFrom;
+  //     acc[`${day.toLowerCase()}BreakTo`] = defaultBreakTo;
+  //   }
+  //   return acc;
+  // }, {});
     setBhourData({
       businessDaysFrom: "Monday",
       businessDaysTo: "Friday",
@@ -371,15 +384,15 @@ function BhourModal({ setOpenModal }) {
         <div className="flex flex-col w-full">
           <div className="button_days">
             {daysOfWeek.map((day) => (
-              <button
-                key={day}
-                onClick={() => toggleWorkHourAndBreak(day)}
-                className={`day-button ${
-                  isCurrentDay(day) ? "selected-day" : ""
-                }`}
-              >
-                {day}
-              </button>
+             <button
+             key={day}
+             onClick={() => toggleWorkHourAndBreak(day)}
+             className={`day-button ${
+               isCurrentDay(day) ? "selected-day" : ""
+             } ${day === "Sat" || day === "Sun" ? "weekend-day" : ""}`}
+           >
+             {day}
+           </button>
             ))}
           </div>
           <div className="flex items-center ml-[40px]">
@@ -387,9 +400,9 @@ function BhourModal({ setOpenModal }) {
               <div key={day} className="day_container  ">
                 {selectedDay === day && (
                   <>
-                    <div className="work_hours">
+                    <div className="work_hours ">
                       <h2> Work Hours</h2>
-                      <div className="select_time ">
+                      <div className="select_time  ml-[-15px]">
                         <select
                           value={bhourData[`${day.toLowerCase()}WorkHoursFrom`]}
                           onChange={handleChange}
