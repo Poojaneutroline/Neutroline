@@ -4,9 +4,11 @@ import Sidebar from "../components/Sidebar";
 import Bhours from "../components/Bhours";
 import Service from "../components/Service";
 import BhoursC from "../components/BHoursC";
+import { AppProvider } from "../AppContext";
 
 const Settings = () => {
   return (
+    <AppProvider>
     <div>
       <Header />
       <div className="flex relative">
@@ -21,6 +23,7 @@ const Settings = () => {
         
       </div>
     </div>
+    </AppProvider>
   );
 };
 

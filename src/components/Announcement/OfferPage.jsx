@@ -60,7 +60,7 @@ const OfferPage = () => {
           }}
         >
           {addModalType === "announcement" && <AddAnnouncementForm />}
-        {addModalType === "offers" && <AddOffersModal />}
+        {addModalType === "offers" && <AddOffersModal closeModal={closeModal} />}
         </Modal>
         <div className="flex  items-center justify-between w-full">
           <h1 className="text-[27px] text-[#3F26A5] ">Announcement</h1>

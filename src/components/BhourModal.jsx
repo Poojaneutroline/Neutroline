@@ -76,17 +76,7 @@ function BhourModal({ setOpenModal }) {
       ...customValuesByDay,
     });
   };
-  const [workHourOpen, setWorkHourOpen] = useState(false);
-  const [breakOpen, setBreakOpen] = useState(false);
-
-  const toggleWorkHour = () => {
-    setWorkHourOpen(!workHourOpen);
-  };
-
-  const toggleBreak = () => {
-    setBreakOpen(!breakOpen);
-  };
-
+ 
   const [selectedOption, setSelectedOption] = useState("custom");
 
   const handleOptionChange = (e) => {
@@ -103,20 +93,7 @@ function BhourModal({ setOpenModal }) {
   );
   const defaultTimezone = "America/New_York"; // Set your default timezone here
 
-  const [checked, setChecked] = useState(false);
 
-  const handleToggle = (itemId) => {
-    // Find the item in the data array and update its checked state
-    const updatedData = data.map((item) => {
-      if (item.id === itemId) {
-        return { ...item, checked: !item.checked };
-      }
-      return item;
-    });
-
-    // Update the data array with the updatedData
-    setData(updatedData);
-  };
   const [data, setData] = useState([
     {
       id: 1,
@@ -310,7 +287,8 @@ function BhourModal({ setOpenModal }) {
               <option value="Sunday">Sunday</option>
             </select>
           </div>
-          {additionalBusinessDays.map((data, index) => (
+          {selectedOption==="custom" && (
+          additionalBusinessDays.map((data, index) => (
             <div
               key={index}
               className="  ml-[30px] mb-[-10px]  flex gap-[12px] items-center pb-[10px]"
@@ -361,20 +339,18 @@ function BhourModal({ setOpenModal }) {
                 }
               />
             </div>
-          ))}
+          ))
+          )}
         </div>
 
         <div className="edit">
-          <img
-            src={add}
-            onClick={handleAddClick}
-            className={selectedOption === "default" ? "hidden" : ""}
-          />
-          {/* <img
-            src={trash}
-            className={selectedOption === "default" ? "hidden" : ""}
-          /> */}
-        </div>
+  {selectedOption === "custom" && (
+    <img
+      src={add}
+      onClick={handleAddClick}
+    />
+  )}
+</div>
 
         {/* {selectedWeekday && <p>Selected weekday: {selectedWeekday}</p>} */}
       </div>
@@ -427,13 +403,19 @@ function BhourModal({ setOpenModal }) {
                           <option value="06:00 AM">06:00 AM</option>
                         </select>
                       </div>
+                      {selectedOption === "custom" && (
                       <img
                         src={add}
                         onClick={handleAddWork}
                         className={selectedOption === "default" ? "hidden" : ""}
                       />
+                      )}
                     </div>
-                    {additionalWorkDays.map((data, index) => (
+                   {/* {isDefaultMode ? null :(
+                    
+                   )} */}
+                   {selectedOption==="custom" &&(
+                    additionalWorkDays.map((data, index) => (
                       <div
                         key={index}
                         className="select_time ml-[126px] mb-[-10px] mt-[10px] flex gap-[12px] items-center pb-[10px]"
@@ -484,7 +466,8 @@ function BhourModal({ setOpenModal }) {
                           }
                         />
                       </div>
-                    ))}
+                    ))
+                    )}
                     <div className="work_hours">
                       <h2>Break</h2>
                       <div className="select_time ml-[-15px]">
@@ -555,7 +538,8 @@ function BhourModal({ setOpenModal }) {
               <option value="Sunday">Sunday</option>
             </select>
           </div>
-          {additionalHolidays.map((data, index) => (
+          {selectedOption==="custom"&&(
+          additionalHolidays.map((data, index) => (
             <div
               key={index}
               className="  ml-[30px] mb-[-10px]  flex gap-[12px] items-center pb-[10px]"
@@ -606,7 +590,8 @@ function BhourModal({ setOpenModal }) {
                 }
               />
             </div>
-          ))}
+          ))
+          )}
           {/* {additionalBusinessDays.map((data, index) => (
           <div key={index} className="select_days ml-7">
              

@@ -27,23 +27,7 @@ const Offers = () => {
     from: "",
     to: "",
   };
-  const offersData = [
-    {
-      title: "Offer 1",
-      message: "20% off for 30 min consultant",
-      description: "Limited offer",
-      from: "06-15",
-      to: "06-16",
-    },
-    {
-      title: "Offer 2",
-      message: "10% off for 1 hour consultant",
-      description: "Special discount",
-      from: "06-20",
-      to: "06-25",
-    },
-    // Add more offers as needed
-  ];
+  
   useEffect(() => {
     console.log(formDataFromModal);
   }, [formDataFromModal]);
@@ -66,7 +50,7 @@ const Offers = () => {
         />
       </Modal>
 
-      {formDataFromModal.map((offer, index) => (
+      {/* {formDataFromModal.map((offer, index) => (
         <div key={index} className="w-[450px] h-[145px] rounded-[7px] bg-white">
           <div className="w-[450px] h-[50px] bg-[#8FCEDD] rounded-t-[7px] flex items-center justify-center">
             <h2 className="text-white text-[17px] font-[600]">{offer.title}</h2>
@@ -96,8 +80,9 @@ const Offers = () => {
             </div>
           </div>
         </div>
-      ))}
-      {/* {formDataFromModal !== null ? (
+      ))} */}
+      {Array.isArray(formDataFromModal) && formDataFromModal.length > 0 ? (
+      // {formDataFromModal !== null ? (
         formDataFromModal.map((offer, index) => (
           <div
             key={index}
@@ -107,6 +92,20 @@ const Offers = () => {
               <h2 className="text-white text-[17px] font-[600]">
                 {offer.title}
               </h2>
+            </div>
+           
+            <div className="flex px-4 items-center justify-between">
+              <p className="text-[13.2px] text-[#6A5F5F]">
+                {offer.description}
+              </p>
+
+              <div className="flex px-4 items-center justify-end gap-3 pr-5">
+                <p className="text-[13.2px] text-[#6A5F5F]">20 views</p>
+                <div className="flex gap-1">
+                  <img src={edit} alt="edit" className="w-[15px] h-[15px]" />
+                  <img src={trash} alt="trash" className="w-[14px] h-[16px]" />
+                </div>
+              </div>
             </div>
             <div className="flex w-full px-4 py-[17px] gap-4 items-center ">
               <img src={radio} alt="radio" className="w-[12x] h-[12px]" />
@@ -121,24 +120,11 @@ const Offers = () => {
                 onClick={() => openModal(offer)}
               />
             </div>
-            <div className="flex px-4 items-center justify-between">
-              <p className="text-[13.2px] text-[#6A5F5F]">
-                {offer.description}
-              </p>
-
-              <div className="flex px-4 items-center justify-end gap-3 pr-5">
-                <p className="text-[13.2px] text-[#6A5F5F]">20 views</p>
-                <div className="flex gap-1">
-                  <img src={edit} alt="edit" className="w-[15px] h-[15px]" />
-                  <img src={trash} alt="trash" className="w-[14px] h-[16px]" />
-                </div>
-              </div>
-            </div>
           </div>
         ))
       ) : (
         <p>No offers to display.</p>
-      )} */}
+      )}
     </div>
   );
 };

@@ -4,23 +4,8 @@ const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
   const [showModal, setShowModal] = useState(false);
-  const [formDataFromModal, setFormDataFromModal] = useState([
-    {
-      title: "Offer 1",
-      message: "20% off for 30 min consultant",
-      description: "Limited offer",
-      from: "2023-06-15",
-      to: "2023-06-16",
-    },
-    {
-      title: "Offer 2",
-      message: "10% off for 1 hour consultant",
-      description: "Special discount",
-      from: "2023-06-20",
-      to: "2023-06-25",
-    },
-  ]);
-
+  const [formDataFromModal, setFormDataFromModal] = useState([]);
+const [serviceDataFromModal, setServiceDataFromModal]=useState([]);
   const [hello ,setHello] = useState(false)
 
   useEffect(()=>{
@@ -35,6 +20,8 @@ const AppProvider = ({ children }) => {
         setShowModal,
         formDataFromModal,
         setFormDataFromModal,
+        serviceDataFromModal,
+        setServiceDataFromModal,
         hello,
         setHello,
       }}

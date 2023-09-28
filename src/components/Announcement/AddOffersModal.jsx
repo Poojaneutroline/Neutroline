@@ -82,10 +82,11 @@ const AddOffersModal = ({ setGetformData, closeModal }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-    
-      setFormDataFromModal(formData);
-      setHello(true)
-      
+      setFormDataFromModal((prevData) => [...prevData, formData]);
+     
+      setHello(true);
+     
+     closeModal(); 
     } else {
       // console.log('notSubmitted')
       console.log(formData);
