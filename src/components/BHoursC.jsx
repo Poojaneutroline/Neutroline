@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import edit from "../assets/editicon.svg";
 import { Link } from "react-router-dom";
 import BhourModal from "./BhourModal";
@@ -9,9 +9,15 @@ import Hours from "./Hours";
 import ScheduleModal from "./ScheduleModal";
 import schedule from "../assets/schedule.svg";
 import info from "../assets/info.svg";
+import { AppContext } from "../AppContext";
 
 
 const BhoursC = () => {
+
+  
+  const { businessDataFromModal, setShowModal } = useContext(AppContext);
+  
+
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSOpen, setModalSOpen] = useState(false);
 
@@ -35,6 +41,7 @@ const BhoursC = () => {
     setIsHovering(false);
   };
 
+  
   return (
     <>
       <Modal
@@ -47,7 +54,7 @@ const BhoursC = () => {
           closeButton: "customButton",
         }}
       >
-        <ScheduleModal onClose={onCloseSModal} />
+        <ScheduleModal onClose={onCloseSModal} setOpenModal={setModalOpen} />
       </Modal>
       {/* {modalOpen && <BhourModal setOpenModal={setModalOpen}  />} */}
       <Modal
@@ -61,7 +68,8 @@ const BhoursC = () => {
           
         }}
       >
-        <BhourModal />
+        <BhourModal open={modalOpen}
+        onClose={onCloseModal} />
         {/* <Hours/> */}
       </Modal>
       <div className="pb-5 md:pb-20">
@@ -73,7 +81,10 @@ const BhoursC = () => {
           <div className="flex justify-between ">
             <div className="flex gap-3 items-center ">
             <h1 className="text-[22px] text-[#0C1A97]">Business Hours</h1>
-            <img src={info} alt="info" className="h-[16px] w-[16px] " title="Custom"/>
+            <div>
+            <img src={info} alt="info" className={`h-[16px] w-[16px]`} title={businessDataFromModal.selectedMode} />
+            </div>
+           
 
             </div>
 
@@ -86,9 +97,9 @@ const BhoursC = () => {
           <div className="flex gap-11 pt-3">
             <h3 className="w-[120px]  font-medium">Business Days</h3>
             <div className="flex gap-8">
-              <h2 className="w-[60px]">Monday</h2>
+              <h2 className="w-[60px]">{businessDataFromModal.businessDaysFrom}</h2>
               <p>-</p>
-              <h2 className="w-[100px] ">Monday</h2>
+              <h2 className="w-[100px] ">{businessDataFromModal.businessDaysTo}</h2>
             </div>
           </div>
           <div className="flex gap-11 pt-3 ">

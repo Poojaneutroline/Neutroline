@@ -5,13 +5,13 @@ const AppContext = createContext();
 const AppProvider = ({ children }) => {
   const [showModal, setShowModal] = useState(false);
   const [formDataFromModal, setFormDataFromModal] = useState([]);
-const [serviceDataFromModal, setServiceDataFromModal]=useState([]);
-  const [hello ,setHello] = useState(false)
+  const [serviceDataFromModal, setServiceDataFromModal] = useState([]);
+  const [businessDataFromModal, setBusinessDataFromModal]=useState([]);
+  const [hello, setHello] = useState(false);
 
-  useEffect(()=>{
-    console.log(formDataFromModal)
-    
-  },[hello])
+  useEffect(() => {
+    console.log(formDataFromModal);
+  }, [hello]);
 
   return (
     <AppContext.Provider
@@ -22,6 +22,8 @@ const [serviceDataFromModal, setServiceDataFromModal]=useState([]);
         setFormDataFromModal,
         serviceDataFromModal,
         setServiceDataFromModal,
+        businessDataFromModal,
+        setBusinessDataFromModal,
         hello,
         setHello,
       }}

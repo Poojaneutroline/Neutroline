@@ -1,6 +1,7 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import preview from "../assets/preview.png";
 import right from "../assets/right.svg";
+import { AppContext } from "../AppContext";
 
 const ScheduleModal = ({ onClose }) => {
   
