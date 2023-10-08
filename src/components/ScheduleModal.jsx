@@ -3,18 +3,103 @@ import preview from "../assets/preview.png";
 import right from "../assets/right.svg";
 import { AppContext } from "../AppContext";
 
-const ScheduleModal = ({ onClose }) => {
+const ScheduleModal = ({ onClose,setOpenModal }) => {
+  const {businessDataFromModal}=useContext(AppContext);
+  // console.log(businessDataFromModal.workHours);
+  const Monday={
+    workfrom:businessDataFromModal.workHours.monWorkHoursFrom,
+    workto:businessDataFromModal.workHours.monWorkHoursTo,
+    breakfrom:businessDataFromModal.workHours.monBreakFrom,
+    breakto:businessDataFromModal.workHours.monBreakTo};
+
+    const Tuesday={
+     workfrom: businessDataFromModal.workHours.tueWorkHoursFrom,
+     workto: businessDataFromModal.workHours.tueWorkHoursTo,
+      breakfrom:businessDataFromModal.workHours.tueBreakFrom,
+      breakto:businessDataFromModal.workHours.tueBreakTo};
+
+      const Wednesday={
+       workfrom: businessDataFromModal.workHours.wedWorkHoursFrom,
+        workto:businessDataFromModal.workHours.wedWorkHoursTo,
+        breakfrom:businessDataFromModal.workHours.wedBreakFrom,
+        breakto:businessDataFromModal.workHours.wedBreakTo};
+
+        const Thursday={
+          workfrom:businessDataFromModal.workHours.thuWorkHoursFrom,
+          workto:businessDataFromModal.workHours.thuWorkHoursTo,
+          breakfrom:businessDataFromModal.workHours.thuBreakFrom,
+          breakto:businessDataFromModal.workHours.thuBreakTo};
+
+          const Friday={
+            workfrom:businessDataFromModal.workHours.friWorkHoursFrom,
+            workto:businessDataFromModal.workHours.friWorkHoursTo,
+            breakfrom:businessDataFromModal.workHours.friBreakFrom,
+            breakto:businessDataFromModal.workHours.friBreakTo};
+
+            const Saturday={
+              workfrom:businessDataFromModal.workHours.satWorkHoursFrom,
+              workto:businessDataFromModal.workHours.satWorkHoursTo,
+              breakfrom:businessDataFromModal.workHours.satBreakFrom,
+              breakto:businessDataFromModal.workHours.satBreakTo};
+
+              const Sunday={
+                workfrom:businessDataFromModal.workHours.sunWorkHoursFrom,
+                workto:businessDataFromModal.workHours.sunWorkHoursTo,
+                breakfrom:businessDataFromModal.workHours.sunBreakFrom,
+                breakto:businessDataFromModal.workHours.sunBreakTo};
+                const weekdays = [
+                  {
+                    day: 'Monday',
+                    workfrom: Monday.workfrom,
+                    workto: Monday.workto,
+                    breakfrom: Monday.breakfrom,
+                    breakto: Monday.breakto
+                  },
+                  {
+                    day: 'Tuesday',
+                    workfrom: Tuesday.workfrom,
+                    workto: Tuesday.workto,
+                    breakfrom: Tuesday.breakfrom,
+                    breakto: Tuesday.breakto
+                  },
+                  {
+                    day: 'Wednesday',
+                    workfrom:Wednesday.workfrom,
+                    workto: Wednesday.workto,
+                    breakfrom: Wednesday.breakfrom,
+                    breakto: Wednesday.breakto
+                  }, 
+                  {
+                    day: 'Thursday',
+                    workfrom: Thursday.workfrom,
+                    workto: Thursday.workto,
+                    breakfrom: Thursday.breakfrom,
+                    breakto: Thursday.breakto
+                  },
+                  {
+                    day: 'Friday',
+                    workfrom: Friday.workfrom,
+                    workto: Friday.workto,
+                    breakfrom: Friday.breakfrom,
+                    breakto: Friday.breakto
+                  },
+                  {
+                    day: 'Saturday',
+                    workfrom: Saturday.workfrom,
+                    workto: Saturday.workto,
+                    breakfrom: Saturday.breakfrom,
+                    breakto: Saturday.breakto
+                  },
+                  {
+                    day: 'Sunday',
+                    workfrom: Sunday.workfrom,
+                    workto: Sunday.workto,
+                    breakfrom: Sunday.breakfrom,
+                    breakto: Sunday.breakto
+                  },
+                ];
   
   
-  const weekdays = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];  
   const [rotationStates, setRotationStates] = useState(
     weekdays.map((_, index) => index === getCurrentDayIndex())
   );
@@ -78,6 +163,7 @@ const ScheduleModal = ({ onClose }) => {
         </div>
       </div>  
       {/* bg-[#f1f3f9]  */}
+   
       {weekdays.map((day, index) => (
         <div
           key={index}
@@ -106,24 +192,24 @@ const ScheduleModal = ({ onClose }) => {
                 className={`w-[12px] h-[14px] ml-2 transform ${
                   rotationStates[index]? "rotate-90" : ""
                 }`} />
-                {day}
+                {day.day}
               </div>
               {rotationStates[index] &&(
                 <div className=" h-full   text-[#5a5a5a] text-[13px] text-center rounded-lg  flex flex-col items-center ml-[45px] py-1 px-4 w-full ">
                   <div className="flex gap-2 ml-7 mt-2 ">
                     <h4 className="text-[12px] w-[100px] font-[600]  flex items-start ">WORK HOURS</h4>
                     <div className=" flex gap-4">
-                      <span className="text-[12px] text-[#8562ee] "> 09:00 AM </span>
+                      <span className="text-[12px] text-[#8562ee] "> {day.workfrom}</span>
                       <p>-</p>
-                      <span className="text-[#8562ee]">05:00 PM</span>
+                      <span className="text-[#8562ee]">{day.workto}</span>
                     </div>
                   </div>
                   <div className="flex gap-2 ml-7 mt-2 ">
                     <h4 className="text-[12px] w-[100px] font-[600] flex items-start">BREAK</h4>
                     <div className=" flex gap-4">
-                      <span className="text-[12px] text-[#8562ee] "> 01:00 PM </span>
+                      <span className="text-[12px] text-[#8562ee] ">{day.breakfrom}</span>
                       <p>-</p>
-                      <span className="text-[#8562ee]">02:00 PM</span>
+                      <span className="text-[#8562ee]">{day.breakto}</span>
                       </div>
                 </div>
               </div>

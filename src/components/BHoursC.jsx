@@ -41,7 +41,7 @@ const BhoursC = () => {
     setIsHovering(false);
   };
 
-  
+  console.log(businessDataFromModal);
   return (
     <>
       <Modal
@@ -82,7 +82,7 @@ const BhoursC = () => {
             <div className="flex gap-3 items-center ">
             <h1 className="text-[22px] text-[#0C1A97]">Business Hours</h1>
             <div>
-            <img src={info} alt="info" className={`h-[16px] w-[16px]`} title={businessDataFromModal.selectedMode} />
+            <img src={info} alt="info" className={`h-[16px] w-[16px]`} title={businessDataFromModal.mode} />
             </div>
            
 
@@ -97,9 +97,9 @@ const BhoursC = () => {
           <div className="flex gap-11 pt-3">
             <h3 className="w-[120px]  font-medium">Business Days</h3>
             <div className="flex gap-8">
-              <h2 className="w-[60px]">{businessDataFromModal.businessDaysFrom}</h2>
+              <h2 className="w-[60px]">{businessDataFromModal.workHours?.businessDaysFrom||"Data"}</h2>
               <p>-</p>
-              <h2 className="w-[100px] ">{businessDataFromModal.businessDaysTo}</h2>
+              <h2 className="w-[100px] ">{businessDataFromModal.workHours?.businessDaysTo||"Data"}</h2>
             </div>
           </div>
           <div className="flex gap-11 pt-3 ">

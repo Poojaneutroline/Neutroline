@@ -200,21 +200,21 @@ function BhourModal({ setOpenModal, onClose }) {
     const savedData = {
       mode: selectedOption,
       timezone: selectedTimezone,
-      businessDays: {
-        from: bhourData.businessDaysFrom,
-        to: bhourData.businessDaysTo,
-      },
       workHours: { ...bhourData },
       additionalBusinessDays: [...additionalBusinessDays],
       additionalWorkDays: [...additionalWorkDays],
       additionalHolidays: [...additionalHolidays],
     };
-    console.log("Saved Data:", savedData);
-    setBusinessDataFromModal({
-      businessDaysFrom: bhourData.businessDaysFrom,
-      businessDaysTo: bhourData.businessDaysTo,
-      selectedMode: selectedOption,
-    });
+    // console.log("Saved Data:", savedData.workHours);
+    setBusinessDataFromModal(savedData
+    //   {
+    //   businessDaysFrom: bhourData.businessDaysFrom,
+    //   businessDaysTo: bhourData.businessDaysTo,
+    //   selectedMode: selectedOption,
+      
+    //   // monHours: bhourData.workHours.monWorkHoursFrom || "Default Value", // Use default value if monWorkHoursFrom is undefined
+    // }
+    );
 
     onClose(true);
   };
