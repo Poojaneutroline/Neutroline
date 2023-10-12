@@ -201,6 +201,7 @@ margin-right: 7px;
 }
 .selected-day {
   background: rgba(75, 118, 236, 0.6)  !important;
+  color: white !important;
 
 }
 .day-button {
@@ -218,5 +219,9 @@ margin-right: 7px;
 }
 .weekend-day {
   background-color: #b5b5b5; /* Set your desired background color */
+}
+.clicked-day {
+  border: 2px solid #92cff2 !important;
+
 }
 

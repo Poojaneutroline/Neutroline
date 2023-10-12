@@ -87,6 +87,17 @@ const Service = () => {
     console.log(serviceDataFromModal);
   }, [serviceDataFromModal]);
 
+  const [editServiceData, setEditServiceData] = useState(null);
+  // Function to handle the "Edit" action
+  const handleEdit = (service) => {
+    setEditServiceData(service);
+    setAddModal(true);
+  };
+  const handleAddNewService = () => {
+    // Reset editServiceData when adding a new service
+    setEditServiceData(null);
+    setAddModal(true);
+  };
   return (
     <div>
       <Modal
@@ -102,10 +113,29 @@ const Service = () => {
         <AddNewService
           setServiceDataFromModal={setServiceDataFromModal}
           setOpenModal={openAddModal}
+          onCloseModal={closeAddModal}        />
+      </Modal>
+      {addModal && (
+      <Modal
+        open={addModal}
+        onClose={closeAddModal}
+        center
+        classNames={{
+          overlay: "customOverlay",
+          modal: "customModal",
+          closeButton: "customButton",
+        }}
+      >
+        <AddNewService
+          setServiceDataFromModal={setServiceDataFromModal}
+          setOpenModal={openAddModal}
           onCloseModal={closeAddModal}
+          editService={editServiceData} // Pass the selected service data as the editService prop
+          mode={editServiceData ? "edit" : "add"}
+          data={editServiceData ? "update": "add"}
         />
       </Modal>
-
+)}
       <Modal
         open={modalOpen}
         onClose={onCloseModal}
@@ -124,7 +154,7 @@ const Service = () => {
         <h1 className="text-[22px] text-[#0C1A97]  mb-[-5px]">All Services</h1>
         <button
           className="bg-[#f8f8f8] px-[11px] py-[8px] text-[#5B76FC] font-[600] shadow-md rounded-[4px] mr-1"
-          onClick={openAddModal}
+          onClick={handleAddNewService} // Call handleAddNewService function when "Add New Service" button is clicked
         >
           + Add Services
         </button>
@@ -205,7 +235,9 @@ const Service = () => {
 
                     <td className="text-center ">
                       <div className="flex gap-2 items-center justify-center w-[200px]  ">
+                        <button onClick={() => handleEdit(offer)}>  
                         <img src={edit} className="w-5" alt="yellow"></img>
+                        </button>
                         <button onClick={() => viewDetails(offer)}>
                           <img src={view} className="w-5" alt="yellow"></img>
                         </button>

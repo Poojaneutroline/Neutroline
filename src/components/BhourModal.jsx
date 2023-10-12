@@ -82,7 +82,7 @@ function BhourModal({ setOpenModal, onClose }) {
     });
   };
 
-  const [selectedOption, setSelectedOption] = useState("custom");
+  const [selectedOption, setSelectedOption] = useState("default");
 
   const handleOptionChange = (e) => {
     setSelectedOption(e.target.value);
@@ -109,11 +109,22 @@ function BhourModal({ setOpenModal, onClose }) {
 
   const isDefaultMode = selectedOption === "default";
 
+  const [clickedDays, setClickedDays] = useState([]);
+
+  const handleDayClick = (day) => {
+    if (clickedDays.includes(day)) {
+      setClickedDays(clickedDays.filter(item => item !== day));
+    } else {
+      setClickedDays([...clickedDays, day]);
+    }
+  };
+
   const toggleWorkHourAndBreak = (day) => {
     if (isDefaultMode && (day === "Sat" || day === "Sun")) {
       return;
     }
     setSelectedDay(selectedDay === day ? null : day);
+    handleDayClick(day);
   };
 
   const [additionalBusinessDays, setAdditionalBusinessDays] = useState([]);
@@ -206,19 +217,20 @@ function BhourModal({ setOpenModal, onClose }) {
       additionalHolidays: [...additionalHolidays],
     };
     // console.log("Saved Data:", savedData.workHours);
-    setBusinessDataFromModal(savedData
-    //   {
-    //   businessDaysFrom: bhourData.businessDaysFrom,
-    //   businessDaysTo: bhourData.businessDaysTo,
-    //   selectedMode: selectedOption,
-      
-    //   // monHours: bhourData.workHours.monWorkHoursFrom || "Default Value", // Use default value if monWorkHoursFrom is undefined
-    // }
+    setBusinessDataFromModal(
+      savedData
+      //   {
+      //   businessDaysFrom: bhourData.businessDaysFrom,
+      //   businessDaysTo: bhourData.businessDaysTo,
+      //   selectedMode: selectedOption,
+
+      //   // monHours: bhourData.workHours.monWorkHoursFrom || "Default Value", // Use default value if monWorkHoursFrom is undefined
+      // }
     );
 
     onClose(true);
   };
-
+  
   return (
     <div className="modalContainer">
       <div className="titleCloseBtn"></div>
@@ -391,7 +403,7 @@ function BhourModal({ setOpenModal, onClose }) {
                 onClick={() => toggleWorkHourAndBreak(day)}
                 className={`day-button ${
                   isCurrentDay(day) ? "selected-day" : ""
-                } ${day === "Sat" || day === "Sun" ? "weekend-day" : ""}`}
+                } ${clickedDays.includes(day) ? "clicked-day" : ""} ${day === "Sat" || day === "Sun" ? "weekend-day" : ""}`}
               >
                 {day}
               </button>

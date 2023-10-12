@@ -3,15 +3,15 @@ import "./addnewservice.css";
 import add from "../assets/add.png";
 import trash from "../assets/trash.png";
 import { AppContext } from "../AppContext";
-const AddNewService = ({ setData, data, setOpenModal, onCloseModal }) => {
-  const { setServiceDataFromModal, setHello } = useContext(AppContext);
+const AddNewService = ({  setOpenModal, onCloseModal, editService,mode, data }) => {
+  const { serviceDataFromModal, setServiceDataFromModal, setHello } = useContext(AppContext);
   const [newService, setNewService] = useState({
-    id: Date.now().toString(),
-    servicename: "",
-    availability: "",
-    duration: "",
-    visibility: false,
-    description: "",
+    id: editService ? editService.id : Date.now().toString(), // Set id for editing, or leave it empty for new service
+    servicename: editService ? editService.servicename : "",
+    availability:editService ? editService.availability: "",
+    duration: editService ?editService.duration:"",
+    visibility:editService? editService.visibility : false,
+    description: editService? editService.description:"",
     weekdays: [
       {
         name: "Mon",
@@ -218,12 +218,20 @@ const AddNewService = ({ setData, data, setOpenModal, onCloseModal }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForms()) {
-      setServiceDataFromModal((prevData) => [...prevData, newService]);
+      if (mode === "edit") {
+        // Update existing service data in serviceDataFromModal
+        const updatedServiceData = serviceDataFromModal.map((service) =>
+          service.id === newService.id ? newService : service
+        );
+        setServiceDataFromModal(updatedServiceData);
+      } else {
+        // Add new service data to serviceDataFromModal
+        setServiceDataFromModal((prevData) => [...prevData, newService]);
+      }
       setHello(true);
       onCloseModal();
     }
   };
-
   const [selectedWeekday, setSelectedWeekday] = useState(null);
   const [useCustomHours, setUseCustomHours] = useState(false);
 
@@ -317,12 +325,17 @@ const AddNewService = ({ setData, data, setOpenModal, onCloseModal }) => {
       };
     });
   };
+useEffect(() => {
+    if (editService) {
+      setNewService(editService);
+    }
+  }, [editService]);
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="bg-[#e9edf5] w-[620px]  flex flex-col gap-4 px-6 py-4 rounded-md">
         <h2 className=" flex items-center justify-center text-[22px]">
-          Add New Service
+        {mode === "edit" ? "Edit Service" : "Add New Service"}
         </h2>
         <div className="mx-4 ">
           <label>
@@ -477,7 +490,7 @@ const AddNewService = ({ setData, data, setOpenModal, onCloseModal }) => {
                   value={weekday.option3}
                   className="text-[15px] border w-[100px] h-[35px] px-3 rounded-[5px] shadow-sm focus:ring-0.5"
                   onChange={(e) =>
-                  handleAdditionalTime(index, "option3", e.target.value)
+                    handleAdditionalTime(index, "option3", e.target.value)
                   }
                 >
                   <option>Select</option>
@@ -592,7 +605,7 @@ const AddNewService = ({ setData, data, setOpenModal, onCloseModal }) => {
             className="bg-[#0aa1ddf5] text-[white] font-[500] font-inter p-4 rounded-[5px] flex justify-center  items-center text-[16px] h-[39px] "
             style={{ boxShadow: "0px 2px 2px 0px rgba(0, 0, 0, 0.25)" }}
           >
-            Add Service
+           {data === "update" ? "Update Service" : "Add Service"}
           </button>
         </div>
       </div>
