@@ -15,6 +15,9 @@ const Service = () => {
   const [checked, setChecked] = useState(false);
   const { serviceDataFromModal, setServiceDataFromModal } =
     useContext(AppContext);
+    const {businessDataFromModal}=useContext(AppContext);
+    const businessDaysFrom = businessDataFromModal.workHours?.businessDaysFrom ||"from";
+    const businessDaysTo = businessDataFromModal.workHours?.businessDaysTo || "To";
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [addModal, setAddModal] = useState(false);
@@ -45,6 +48,7 @@ const Service = () => {
   ]);
 
   const getAvailabilityDays = (availability) => {
+    
     return availability.trim().split(""); // Split the availability string into individual characters
   };
 
@@ -65,6 +69,12 @@ const Service = () => {
   const onCloseModal = () => setModalOpen(false);
 
   const viewDetails = (service) => {
+    // Include the day.visibility value in the selectedService object
+  const selectedServiceWithVisibility = {
+    ...service,
+    visibility: service.weekdays.map((day) => day.visibility),
+    description:serviceDataFromModal.description,
+  };
     setSelectedService(service);
     setModalOpen(true);
   };
@@ -75,14 +85,22 @@ const Service = () => {
   const closeAddModal = () => {
     setAddModal(false);
   };
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [serviceToDelete, setServiceToDelete] = useState(null);
   const handleDelete = (itemId) => {
     // Filter out the item with the matching id from the serviceDataFromModal array
+   
+    setServiceToDelete(itemId);
+    setConfirmModalOpen(true);
+  };
+  const confirmDelete = () => {
+    // Filter out the item with the matching id from the serviceDataFromModal array
     const updatedServiceData = serviceDataFromModal.filter(
-      (item) => item.id !== itemId
+      (item) => item.id !== serviceToDelete
     );
     setServiceDataFromModal(updatedServiceData);
+    setConfirmModalOpen(false); // Close the confirmation modal after deletion
   };
-
   useEffect(() => {
     console.log(serviceDataFromModal);
   }, [serviceDataFromModal]);
@@ -100,6 +118,37 @@ const Service = () => {
   };
   return (
     <div>
+      <Modal
+        open={confirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        center
+        classNames={{
+          overlay: "customOverlay",
+          modal: "customModal",
+          closeButton: "customButton",
+        }}
+      >
+ <div className="w-full sm:w-[450px]  bg-[white] rounded-[10px] h-full"> 
+ <div className="w-full sm:w-[450px] sm:h-[60px] p-2  rounded-t-[10px] flex items-left justify-left">
+ <h1 className="text-[18px] p-4">Are you sure want to delete this service?</h1>
+ </div>
+ <div className="flex pb-4 sm:pb-6   mt-[20px] gap-4 justify-end px-4  ">
+        <button
+          className="bg-[#6499E9] text-[white] font-[600] font-inter px-[15px] rounded-[5px] flex justify-center  items-center text-[16px] h-[36px]"
+          onClick={confirmDelete}
+        >
+          Delete
+        </button>
+        <button
+ className=" text-[#6499E9] font-[600] font-inter px-[15px] rounded-[5px] flex justify-center  items-center text-[16px] h-[36px] border-[1px] border-[#6499E9]"
+ style={{ boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }} 
+          onClick={() => setConfirmModalOpen(false)}
+        >
+          Cancel
+        </button>{" "}
+      </div>
+    </div>
+    </Modal>
       <Modal
         open={addModal}
         onClose={closeAddModal}

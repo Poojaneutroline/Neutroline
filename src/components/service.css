@@ -1,8 +1,7 @@
-/* .customButton {
-    top: 10px;
-    right: 8px;
-    padding: 20px;
-  } */
+.customButton {
+    margin-top: -10px;
+    margin-right: -6px;
+  }
   .customModal {
     background:none;
     padding:0;

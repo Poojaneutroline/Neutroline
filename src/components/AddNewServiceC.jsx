@@ -37,7 +37,6 @@ const [lastAssignedId, setLastAssignedId] = useState(initialLastAssignedId);
         option6: "",
         visibility: false,
         selected: false,
-
       },
       {
         name: "Tue",
@@ -300,6 +299,13 @@ const [lastAssignedId, setLastAssignedId] = useState(initialLastAssignedId);
   const [selectedWeekday, setSelectedWeekday] = useState(null);
 
   const handleOptionChange = (event, weekdayIndex, optionType) => {
+    // if (useCustomHours) {
+    //   const { name, value } = event.target;
+    //   setNewService((prevService) => ({
+    //     ...prevService,
+    //     [name]: value,
+    //   }));
+    // }
     const { value } = event.target;
     setNewService((prevService) => {
       const updatedWeekdays = [...prevService.weekdays];
@@ -320,6 +326,17 @@ const [lastAssignedId, setLastAssignedId] = useState(initialLastAssignedId);
   const handleCustomHoursToggle = () => {
     setUseCustomHours(!useCustomHours);
     if (!useCustomHours) {
+      // // Set default values when custom hours are disabled
+      // setNewService((prevService) => ({
+      //   ...prevService,
+      //   option1: defaultOptions.option1,
+      //   option2: defaultOptions.option2,
+      //   weekdays: prevService.weekdays.map((weekday) => ({
+      //     ...weekday,
+      //     option1: defaultOptions.option1,
+      //     option2: defaultOptions.option2,
+      //   })),
+      // }));
       // Check if businessDataFromModal includes Monday to Friday
       const businessDaysFrom =
         businessDataFromModal.workHours?.businessDaysFrom || "From";
@@ -357,7 +374,28 @@ const [lastAssignedId, setLastAssignedId] = useState(initialLastAssignedId);
 
   const [additionalTime, setAdditionalTime] = useState([]);
 
- 
+  const handleAdditionalTime = (index, field, value) => {
+    const updatedAdditionalTime = [...additionalTime];
+    if (field === "delete") {
+      updatedAdditionalTime.splice(index, 1); // Remove the selected entry
+    } else {
+      updatedAdditionalTime[index][field] = value;
+    }
+    setNewService((prevService) => {
+      const updatedWeekdays = [...prevService.weekdays];
+      updatedWeekdays[selectedWeekday][field] = value;
+      return {
+        ...prevService,
+        weekdays: updatedWeekdays,
+      };
+    });
+    setAdditionalTime(updatedAdditionalTime);
+  };
+  const handleAddTime = () => {
+    if (additionalTime.length < 2) {
+      setAdditionalTime([...additionalTime, { from: "", to: "" }]);
+    }
+  };
 
   const handleWeekdayCheckboxChange = (weekdayIndex) => {
     setNewService((prevService) => {
@@ -376,67 +414,6 @@ const [lastAssignedId, setLastAssignedId] = useState(initialLastAssignedId);
     }
   }, [editService]);
 
-  const handleAddTime = () => {
-    const updatedWeekdays = newService.weekdays.map((weekday) => {
-      if (weekday.selected && weekday.isCustom && weekday.numberOfCustomOptions === 2) {
-        // If all custom options are added, do nothing
-        return weekday;
-      }
-      if (weekday.selected && weekday.isCustom) {
-        // If custom options are already added, add new options to option5 and option6
-        return {
-          ...weekday,
-          option5: "Select", // Initialize option5 with default value
-          option6: "Select", // Initialize option6 with default value
-          numberOfCustomOptions: weekday.numberOfCustomOptions + 1, // Increment the number of custom options added
-        };
-      }
-      if (weekday.selected) {
-        // If custom options are not added yet, add a new pair of options to option3 and option4
-        return {
-          ...weekday,
-          option3: "Select", // Initialize option3 with default value
-          option4: "Select", // Initialize option4 with default value
-          isCustom: true, // Flag to indicate custom options are added
-          numberOfCustomOptions: 1, // Initialize the number of custom options added to 1
-        };
-      }
-      return weekday;
-    });
-  
-    setNewService((prevState) => ({
-      ...prevState,
-      weekdays: updatedWeekdays,
-    }));
-  };
-  
-  
-  const handleDeleteTime = (weekdayIndex) => {
-    setNewService((prevService) => {
-      const updatedWeekdays = [...prevService.weekdays];
-      updatedWeekdays[weekdayIndex].isCustom = false;
-      updatedWeekdays[weekdayIndex].option3 = "";
-      updatedWeekdays[weekdayIndex].option4 = "";
-      return {
-        ...prevService,
-        weekdays: updatedWeekdays,
-      };
-    });
-  };
-  const timeOptions = [
-    "08:00 AM",
-    "09:00 AM",
-    "09:30 AM",
-    "10:00 AM",
-    "11:00 AM",
-    "12:00 PM",
-    "01:00 PM",
-    "02:00 PM",
-    "03:00 PM",
-    "04:00 PM",
-    "05:00 PM",
-    "06:00 PM"
-  ];
   return (
     <form onSubmit={handleSubmit}>
       <div className="bg-[#c7d4ed] w-[590px]  flex flex-col gap-4 px-5 py-3 rounded-md">
@@ -509,9 +486,28 @@ const [lastAssignedId, setLastAssignedId] = useState(initialLastAssignedId);
 
           {selectedWeekday !== null && (
             <div className="flex items-center  my-3 justify-center">
-                           {newService.weekdays.map((weekday, index) => (
+              {/* {useCustomHours &&(
+          <input
+            type="checkbox"
+            name={`weekday_${selectedWeekday}`}
+            className="form-checkbox h-[13px] w-[13px] text-blue-500 mr-2"
+            checked={newService.weekdays[selectedWeekday].visibility}
+            onChange={() => handleWeekdayCheckboxChange(selectedWeekday)}
+          />
+          )} */}
+
+              {/* <label className="w-[70px] text-[14px]">{newService.weekdays[selectedWeekday].name}</label> */}
+              {newService.weekdays.map((weekday, index) => (
                 <div key={index} className="custom-dropdown">
-                                   {weekday.selected && (
+                  {/* <select
+  name={`weekday_${selectedWeekday}_option1`}
+  value={newService.weekdays[selectedWeekday].option1 || defaultOptions.option1}
+  onChange={handleChange}
+  className="text-[15px] border w-[100px] h-[35px] px-3 rounded-[5px] shadow-sm focus:ring-0.5"
+  disabled={!useCustomHours}
+> */}
+                  {/* {selectedWeekday && ( // Conditionally render dropdown for selected weekday */}
+                  {weekday.selected && (
                     <div className="flex gap-3">
                       <label className="w-[52px]">{weekday.name}</label>
                       <select
@@ -523,14 +519,20 @@ const [lastAssignedId, setLastAssignedId] = useState(initialLastAssignedId);
                         className="text-[15px] border w-[100px] h-[35px]  rounded-[5px] shadow-sm focus:ring-0.5"
                         disabled={!useCustomHours}
                       >
-                        <option>Select</option>
-                        {timeOptions.map((time, idx) => (
-    <option key={idx} value={time}>
-      {time}
-    </option>
-  ))}
+                        <option value="08:00 AM">08:00 AM</option>
+                        <option value="09:00 AM">09:00 AM</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="11:00 AM">11:00 AM</option>
                       </select>
-                     
+                      {/* </div>
+          <div className="custom-dropdown "> */}
+                      {/* <select
+  name={`weekday_${selectedWeekday}_option2`}
+  value={newService.weekdays[selectedWeekday].option2 || defaultOptions.option2}
+  onChange={handleChange}
+  className="text-[15px] border w-[100px] h-[35px] px-3 rounded-[5px] shadow-sm focus:ring-0.5"
+  disabled={!useCustomHours}
+> */}
                       <select
                         name={`weekday_${index}_option2`}
                         value={weekday.option2}
@@ -540,16 +542,11 @@ const [lastAssignedId, setLastAssignedId] = useState(initialLastAssignedId);
                         className="text-[15px] border w-[100px] h-[35px] rounded-[5px] shadow-sm focus:ring-0.5"
                         disabled={!useCustomHours}
                       >
-                                                <option>Select</option>
-
-                                                {timeOptions
-    .filter((time) => time !== weekday.option1) // Exclude the selected value from option2
-    .filter((time) => timeOptions.indexOf(time) > timeOptions.indexOf(weekday.option1)) // Exclude all values before the selected value
-    .map((filteredTime, idx) => (
-      <option key={idx} value={filteredTime}>
-        {filteredTime}
-      </option>
-    ))}
+                        <option value="01:00 PM">01:00 PM</option>
+                        <option value="02:00 PM">02:00 PM</option>
+                        <option value="03:00 PM">03:00 PM</option>
+                        <option value="04:00 PM">04:00 PM</option>
+                        {/* Add your options for Option 2 */}
                       </select>
                     </div>
                   )}
@@ -565,101 +562,53 @@ const [lastAssignedId, setLastAssignedId] = useState(initialLastAssignedId);
               )}
             </div>
           )}
-          {newService.weekdays.map((weekday, index) => (
-        <div key={index}        >
-          {weekday.selected && weekday.isCustom && (
-            <>
-            <div className=" ml-[169px] flex gap-3 items-center pb-[10px]">
-            <div className="flex gap-3  custom-dropdown">
-              <select
-                name={`weekday_${index}_option3`}
-                value={weekday.option3}
-                onChange={(e) => handleOptionChange(e, index, "option3")}
-                className="text-[15px] border w-[100px] h-[35px] rounded-[5px] shadow-sm focus:ring-0.5"
-                disabled={!useCustomHours}
-              >
-                <option>Select</option>
-                {timeOptions
-    .filter((time) => time !== weekday.option2) // Exclude the selected value from option2
-    .filter((time) => timeOptions.indexOf(time) > timeOptions.indexOf(weekday.option2)) // Exclude all values before the selected value
-    .map((filteredTime, idx) => (
-      <option key={idx} value={filteredTime}>
-        {filteredTime}
-      </option>
-    ))}
-              </select>
-              <select
-                name={`weekday_${index}_option4`}
-                value={weekday.option4}
-                onChange={(e) => handleOptionChange(e, index, "option4")}
-                className="text-[15px] border w-[100px] h-[35px] rounded-[5px] shadow-sm focus:ring-0.5"
-                disabled={!useCustomHours}
-              >
-                <option>Select</option>
-                {timeOptions
-    .filter((time) => time !== weekday.option3) // Exclude the selected value from option2
-    .filter((time) => timeOptions.indexOf(time) > timeOptions.indexOf(weekday.option3)) // Exclude all values before the selected value
-    .map((filteredTime, idx) => (
-      <option key={idx} value={filteredTime}>
-        {filteredTime}
-      </option>
-    ))}
-              </select>
-            </div>
-            <div>
-              <img src={trash}
-              alt="trash"
-                          onClick={() => handleDeleteTime(index)} // Call the handleDeleteTime function with the index
-                          className=" h-[15px] w-[15px] ml-[48px]"
-
-                         />
-            </div>
-            </div>
-            <div>
-            {weekday.isCustom && weekday.option5 && weekday.option6 && (
-          <>
-          <select
-              name={`weekday_${index}_option5`}
-              value={weekday.option5}
-              onChange={(e) => handleOptionChange(e, index, "option5")}
-              className="text-[15px] border w-[100px] h-[35px] rounded-[5px] shadow-sm focus:ring-0.5"
-              disabled={!useCustomHours}
+          {additionalTime.map((weekday, index) => (
+            <div
+              key={index}
+              className="  ml-[179px] flex gap-3 items-center pb-[10px]"
             >
-               <option>Select</option>
-               {timeOptions
-    .filter((time) => time !== weekday.option4) // Exclude the selected value from option2
-    .filter((time) => timeOptions.indexOf(time) > timeOptions.indexOf(weekday.option4)) // Exclude all values before the selected value
-    .map((filteredTime, idx) => (
-      <option key={idx} value={filteredTime}>
-        {filteredTime}
-      </option>
-    ))}
-            </select>
-            <select
-              name={`weekday_${index}_option6`}
-              value={weekday.option6}
-              onChange={(e) => handleOptionChange(e, index, "option6")}
-              className="text-[15px] border w-[100px] h-[35px] rounded-[5px] shadow-sm focus:ring-0.5"
-              disabled={!useCustomHours}
-            >
-              <option>Select</option>
+              <div className="custom-dropdown ">
+                <select
+                  name={`weekday_${index}_option3`}
+                  value={weekday.option3}
+                  className="text-[15px] border w-[100px] h-[35px] px-3 rounded-[5px] shadow-sm focus:ring-0.5"
+                  onChange={(e) =>
+                    handleAdditionalTime(index, "option3", e.target.value)
+                  }
+                >
+                  <option>Select</option>
+                  <option value="08:00 AM">08:00 AM</option>
+                  <option value="09:00 AM">09:00 AM</option>
+                  <option value="10:00 AM">10:00 AM</option>
+                  <option value="11:00 AM">11:00 AM</option>6
+                </select>
+              </div>
 
-              {timeOptions
-    .filter((time) => time !== weekday.option5) // Exclude the selected value from option2
-    .filter((time) => timeOptions.indexOf(time) > timeOptions.indexOf(weekday.option5)) // Exclude all values before the selected value
-    .map((filteredTime, idx) => (
-      <option key={idx} value={filteredTime}>
-        {filteredTime}
-      </option>
-    ))}
-            </select>
-          </>
-        )}
+              <div className="custom-dropdown">
+                <select
+                  name={`weekday_${index}_option4`}
+                  value={weekday.option4}
+                  className="text-[15px] border w-[100px] h-[35px] px-3 rounded-[5px] shadow-sm focus:ring-0.5"
+                  onChange={(e) =>
+                    handleAdditionalTime(index, "option4", e.target.value)
+                  }
+                >
+                  <option>Select</option>
+                  <option value="01:00 PM">01:00 PM</option>
+                  <option value="02:00 PM">02:00 PM</option>
+                  <option value="03:00 PM">03:00 PM</option>
+                  <option value="04:00 PM">04:00 PM</option>
+                </select>
+              </div>
+
+              <img
+                src={trash}
+                alt="trash"
+                className=" h-[15px] w-[15px] ml-[48px]"
+                onClick={() => handleAdditionalTime(index, "delete")}
+              />
             </div>
-            </>
-          )}
-        </div>
-      ))}
+          ))}
         </div>
 
         <div className="flex justify-between items-center mx-4 ">

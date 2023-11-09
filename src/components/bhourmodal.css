@@ -14,7 +14,7 @@
   width: 578px;
  
   border-radius: 12px;
-  background-color: #e6ebf7;
+  background-color: #c7d4ed;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 2px 1px;
   display: flex;
   flex-direction: column;
@@ -160,7 +160,7 @@ margin-right: 7px;
   align-items: center;
   border-radius: 3px;
   border: 0.5px solid #a9a9a9;
-  font-size: 12px;
+  font-size: 11px;
   padding: 0 5px 0 5px;
 }
 .select_time p {
@@ -182,6 +182,7 @@ margin-right: 7px;
   position: relative;
      z-index: 1;
   
+  
 }
 .select_time select {
   background: #ffffff;
@@ -200,12 +201,12 @@ margin-right: 7px;
      z-index: 1;
 }
 .selected-day {
-  background: rgba(75, 118, 236, 0.6)  !important;
+  background:#6586ea  !important;
   color: white !important;
 
 }
 .day-button {
-  background-color: #f0f0f0; /* Default background color */
+  background-color: #ccd5f2; /* Default background color */
   color: #333; /* Default text color */
   border: none;
   padding: 8px 12px;
@@ -215,7 +216,7 @@ margin-right: 7px;
 }
 
 .day-button:hover {
-  background-color: #e0e0e0;
+  background-color: #a0b9ef;
 }
 .weekend-day {
   background-color: #b5b5b5; /* Set your desired background color */
@@ -223,5 +224,10 @@ margin-right: 7px;
 .clicked-day {
   border: 2px solid #92cff2 !important;
 
+}
+.disabled-day {
+  cursor: not-allowed;
+  opacity: 0.5;
+  /* Add any other styles you want for disabled buttons */
 }
 

@@ -36,17 +36,17 @@ const BhoursC = () => {
   const handleMouseLeave = () => {
     setIsHovering(false);
   };
-  const weekdays = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-  const today = weekdays[new Date().getDay() - 1]; // get current day
+  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const today = weekdays[new Date().getDay()]; // get current day
 
   const weekdaySchedules = weekdays.reduce((acc, day) => {
     const workFrom =
-      businessDataFromModal?.workHours?.[`${day}WorkHoursFrom`] || "From";
+      businessDataFromModal?.workHours?.[`${day.toLowerCase()}WorkHoursFrom`] || "From";
     const workTo =
-      businessDataFromModal?.workHours?.[`${day}WorkHoursTo`] || "To";
+      businessDataFromModal?.workHours?.[`${day.toLowerCase()}WorkHoursTo`] || "To";
     const breakFrom =
-      businessDataFromModal?.workHours?.[`${day}BreakFrom`] || "From";
-    const breakTo = businessDataFromModal?.workHours?.[`${day}BreakTo`] || "To";
+      businessDataFromModal?.workHours?.[`${day.toLowerCase()}BreakFrom`] || "From";
+    const breakTo = businessDataFromModal?.workHours?.[`${day.toLowerCase()}BreakTo`] || "To";
 
     acc[day] = {
       workfrom: workFrom,
@@ -59,6 +59,7 @@ const BhoursC = () => {
   }, {});
   // Find the current day data
   const currentDayData = weekdaySchedules[today];
+  console.log("currentdaydata:" + currentDayData);
   if (currentDayData) {
     console.log(
       `Current Work Hours: ${currentDayData.workfrom} - ${currentDayData.workto}`
@@ -69,15 +70,6 @@ const BhoursC = () => {
   } else {
     console.log("No data available for the current day.");
   }
-  // Access individual weekday schedule like this:
-  // const mondaySchedule = weekdaySchedules.mon;
-  // const tuesdaySchedule = weekdaySchedules.tue;
-  // ...
-
-  // Example Usage:
-  // console.log("Monday Schedule: ", weekdaySchedules.mon);
-  // console.log("Tuesday Schedule: ", weekdaySchedules.tue);
-  // ...
 
   console.log(businessDataFromModal);
   return (
@@ -133,25 +125,52 @@ const BhoursC = () => {
               </button>
             )}
           </div>
-          <div className="flex gap-11 pt-3">
-            <h3 className="w-[120px]  font-medium">Business Days</h3>
-            <div className="flex gap-8">
+          <div className="flex gap-5 pt-3">
+            <h3 className="w-[120px] font-medium border">Business Days</h3>
+            <div className="flex gap-8 border ">
               <h2 className="w-[70px]">
-                {businessDataFromModal.workHours?.businessDaysFrom || "Day"}
+                {businessDataFromModal.workHours?.businessDaysFrom?.slice(0, 3)|| "Day"}
               </h2>
               <p>-</p>
-              <h2 className="w-[100px] ">
-                {businessDataFromModal.workHours?.businessDaysTo || "Day"}
+              <h2 className="w-[70px] ">
+                 {businessDataFromModal.workHours?.businessDaysTo?.slice(0, 3) || "Day"}
               </h2>
+              {businessDataFromModal.workHours?.businessDaysFromOp2 &&(
+                <div className="ml-[-70px]">{","}</div>
+              )}
+                <h2 className="w-[70px]">
+              {businessDataFromModal.workHours?.businessDaysFromOp2?.slice(0, 3) || ""}
+            </h2>
+            {businessDataFromModal.workHours?.businessDaysFromOp2 &&(
+                <div className="ml-[-50px]">{"-"}</div>
+              )}
+            <h2 className="w-[70px] ">
+                {businessDataFromModal.workHours?.businessDaysToOp2?.slice(0, 3) || ""}
+              </h2>
+              
+              {/* <p>-</p> */}
+              {businessDataFromModal.workHours?.businessDaysFromOp3 &&(
+                <div className="ml-[-68px]">{","}</div>
+              )}
+              <h2 className="w-[70px]">
+                {businessDataFromModal.workHours?.businessDaysFromOp3?.slice(0, 3) || ""}
+              </h2>
+              {businessDataFromModal.workHours?.businessDaysFromOp3 &&(
+                <div className="ml-[-50px]">{"-"}</div>
+              )}
+              <h2 className="w-[70px] ">
+                {businessDataFromModal.workHours?.businessDaysToOp3?.slice(0, 3) || ""}
+              </h2>
+              
             </div>
           </div>
-          <div className="flex gap-11 pt-3 ">
+          <div className="flex gap-5 pt-3 ">
             <h3 className="w-[120px]  font-medium">Work Hours</h3>
             <div className="flex gap-8">
-              <h2 className="w-[70px] ">{currentDayData.workfrom}</h2>
+              <h2 className="w-[70px] border ">{currentDayData?.workfrom || "From"}</h2>
               <p>-</p>
-              <h2 className="w-[100px] ">{currentDayData.workto}</h2>
-              <button onClick={openSModal} className="ml-[-15%] cursor-pointer">
+              <h2 className="w-[70px] border  ">{currentDayData?.workto || "To"}</h2>
+              <button onClick={openSModal} className="ml-[-13%] cursor-pointer">
                 <svg
                   width="14"
                   height="16"
@@ -173,34 +192,52 @@ const BhoursC = () => {
               className="w-[15px] h-[15px] ml-[-50px] cursor-pointer"/> */}
             </div>
           </div>
-          <div className="flex gap-11 pt-3">
+          <div className="flex gap-5 pt-3">
             <h3 className="w-[120px]  font-medium">Holidays</h3>
             <div className="flex gap-8">
               <h2 className="w-[70px] ">
-                {businessDataFromModal.workHours?.holidayFrom || "Day"}
+                {businessDataFromModal.workHours?.holidayFrom?.slice(0, 3) || "Day"}
               </h2>
               <p>-</p>
-              <h2 className="w-[100px] ">
-                {businessDataFromModal.workHours?.holidayTo || "Day"}
+              <h2 className="w-[70px] ">
+                {businessDataFromModal.workHours?.holidayTo?.slice(0, 3) || "Day"}
+              </h2>
+              {businessDataFromModal.workHours?.holidayFromOp2 &&(
+                <div className="ml-[-70px]">{","}</div>
+              )}
+                <h2 className="w-[70px]">
+              {businessDataFromModal.workHours?.holidayFromOp2?.slice(0, 3) || ""}
+            </h2>
+            {businessDataFromModal.workHours?.holidayFromOp2 &&(
+                <div className="ml-[-50px]">{"-"}</div>
+              )}
+            <h2 className="w-[70px] ">
+                {businessDataFromModal.workHours?.holidayToOp2?.slice(0, 3) || ""}
+              </h2>
+              
+              {/* <p>-</p> */}
+              {businessDataFromModal.workHours?.holidayFromOp3 &&(
+                <div className="ml-[-68px]">{","}</div>
+              )}
+              <h2 className="w-[70px]">
+                {businessDataFromModal.workHours?.holidayFromOp3?.slice(0, 3) || ""}
+              </h2>
+              {businessDataFromModal.workHours?.holidayFromOp3 &&(
+                <div className="ml-[-50px]">{"-"}</div>
+              )}
+              <h2 className="w-[70px] ">
+                {businessDataFromModal.workHours?.holidayToOp3?.slice(0, 3) || ""}
               </h2>
             </div>
           </div>
-          <div className="flex gap-11 pt-3">
+          <div className="flex gap-5 pt-3">
             <h3 className="w-[120px]  font-medium">Break</h3>
             <div className="flex gap-8">
-              <h2 className="w-[70px] ">{currentDayData.breakfrom}</h2>
+              <h2 className="w-[70px] ">{currentDayData?.breakfrom || "From"}</h2>
               <p>-</p>
-              <h2 className="w-[100px] "> {currentDayData.breakto}</h2>
+              <h2 className="w-[70px] "> {currentDayData?.breakto || "To"}</h2>
             </div>
           </div>
-          {/* <div className="flex justify-end border">
-            <button
-              onClick={openSModal}
-              className="text-[12px] mt-[-5px] bottom-0 right-0   border-[#9f9f9f] hover:border-blue-700 hover:text-[#8645b1] transition duration-300 bg-[#f8f8f8] px-[5px] py-[4px] text-[#5B76FC] font-[600] shadow-md rounded-[4px] "
-            >
-              Custom
-            </button>
-          </div> */}
         </div>
       </div>
     </>

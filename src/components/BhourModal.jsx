@@ -5,24 +5,43 @@ import add from "../assets/add.png";
 import hour from "../assets/hour.svg";
 import TimezoneSelect, { allTimezones } from "react-timezone-select";
 import { AppContext } from "../AppContext";
+import { isDisabled } from "@testing-library/user-event/dist/utils";
 function BhourModal({ setOpenModal, onClose }) {
   const { setBusinessDataFromModal, setShowModal } = useContext(AppContext);
 
-  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   const [bhourData, setBhourData] = useState({
     businessDaysFrom: "",
     businessDaysTo: "",
+    businessDaysFromOp2:"",
+    businessDaysToOp2:"",
+    businessDaysFromOp3:"",
+    businessDaysToOp3:"",
     WorkHoursFrom: "",
     WorkHoursTo: "",
     BreakFrom: "",
     BreakTo: "",
     holidayFrom: "",
     holidayTo: "",
+    holidayFromOp2: "",
+    holidayToOp2: "",
+    holidayFromOp3: "",
+    holidayToOp3: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const updatedValue = value === "Select" ? "" : value; // If value is "Select", set it to empty string, else use the selected value
+
     setBhourData((prevState) => ({
       ...prevState,
       [name]: value,
@@ -41,19 +60,6 @@ function BhourModal({ setOpenModal, onClose }) {
       acc[`${day.toLowerCase()}BreakTo`] = defaultBreakTo;
       return acc;
     }, {});
-    //   if (day === "Sat" || day === "Sun") {
-    //     acc[`${day.toLowerCase()}WorkHoursFrom`] = "Select";
-    //     acc[`${day.toLowerCase()}WorkHoursTo`] = "Select";
-    //     acc[`${day.toLowerCase()}BreakFrom`] = "Select";
-    //     acc[`${day.toLowerCase()}BreakTo`] = "Select";
-    //   } else {
-    //     acc[`${day.toLowerCase()}WorkHoursFrom`] = defaultWorkHoursFrom;
-    //     acc[`${day.toLowerCase()}WorkHoursTo`] = defaultWorkHoursTo;
-    //     acc[`${day.toLowerCase()}BreakFrom`] = defaultBreakFrom;
-    //     acc[`${day.toLowerCase()}BreakTo`] = defaultBreakTo;
-    //   }
-    //   return acc;
-    // }, {});
     setBhourData({
       businessDaysFrom: "Monday",
       businessDaysTo: "Friday",
@@ -68,8 +74,10 @@ function BhourModal({ setOpenModal, onClose }) {
     const customValuesByDay = daysOfWeek.reduce((acc, day) => {
       acc[`${day.toLowerCase()}WorkHoursFrom`] = "Select";
       acc[`${day.toLowerCase()}WorkHoursTo`] = "Select";
+      
       acc[`${day.toLowerCase()}BreakFrom`] = "Select";
       acc[`${day.toLowerCase()}BreakTo`] = "Select";
+
       return acc;
     }, {});
 
@@ -83,6 +91,10 @@ function BhourModal({ setOpenModal, onClose }) {
   };
 
   const [selectedOption, setSelectedOption] = useState("default");
+  useEffect(() => {
+    // Set default values when the component mounts
+    setDefaultValues();
+  }, []);
 
   const handleOptionChange = (e) => {
     setSelectedOption(e.target.value);
@@ -113,7 +125,7 @@ function BhourModal({ setOpenModal, onClose }) {
 
   const handleDayClick = (day) => {
     if (clickedDays.includes(day)) {
-      setClickedDays(clickedDays.filter(item => item !== day));
+      setClickedDays(clickedDays.filter((item) => item !== day));
     } else {
       setClickedDays([...clickedDays, day]);
     }
@@ -123,8 +135,28 @@ function BhourModal({ setOpenModal, onClose }) {
     if (isDefaultMode && (day === "Sat" || day === "Sun")) {
       return;
     }
+    const isEnabledDay =
+    (bhourData.businessDaysFrom &&
+    bhourData.businessDaysTo &&
+    daysOfWeek.indexOf(day) >= daysOfWeek.indexOf(bhourData.businessDaysFrom) &&
+    daysOfWeek.indexOf(day) <= daysOfWeek.indexOf(bhourData.businessDaysTo)) ||
+    additionalBusinessDays.some((additionalDay) => {
+      const fromIndex = daysOfWeek.indexOf(additionalDay.from);
+      const toIndex = daysOfWeek.indexOf(additionalDay.to);
+      return (
+        fromIndex <= daysOfWeek.indexOf(day) && daysOfWeek.indexOf(day) <= toIndex
+      );
+    });
+
+
+  if (isEnabledDay) {
     setSelectedDay(selectedDay === day ? null : day);
     handleDayClick(day);
+  }else{
+    setSelectedDay(null);
+    setClickedDays(clickedDays.filter((item) => item !== day)); // Deselect clicked day
+
+  }
   };
 
   const [additionalBusinessDays, setAdditionalBusinessDays] = useState([]);
@@ -142,47 +174,123 @@ function BhourModal({ setOpenModal, onClose }) {
   };
   const handleAdditionalBusinessDayChange = (index, field, value) => {
     const updatedAdditionalBusinessDays = [...additionalBusinessDays];
+  
     if (field === "delete") {
       updatedAdditionalBusinessDays.splice(index, 1); // Remove the selected entry
     } else {
       updatedAdditionalBusinessDays[index][field] = value;
     }
-
+  
+    if (index === 0) {
+      setBhourData((prevData) => ({
+        ...prevData,
+        businessDaysFromOp2: updatedAdditionalBusinessDays[0]?.from || "",
+        businessDaysToOp2: updatedAdditionalBusinessDays[0]?.to || "",
+      }));
+    } else if (index === 1) {
+      setBhourData((prevData) => ({
+        ...prevData,
+        businessDaysFromOp3: updatedAdditionalBusinessDays[1]?.from || "",
+        businessDaysToOp3: updatedAdditionalBusinessDays[1]?.to || "",
+      }));
+    }
+  
     setAdditionalBusinessDays(updatedAdditionalBusinessDays);
   };
+  
+
   const handleAdditionalWorkDay = (index, field, value) => {
     const updatedAdditionalWorkDays = [...additionalWorkDays];
     if (field === "delete") {
       updatedAdditionalWorkDays.splice(index, 1); // Remove the selected entry
     } else {
+      // Check if the day already exists in additionalWorkDays, if not, add it
+      if (updatedAdditionalWorkDays.length <= index) {
+        updatedAdditionalWorkDays[index] = { from: "", to: "" };
+      }
+      // Update the selected day's work hours
       updatedAdditionalWorkDays[index][field] = value;
     }
+  
+    // Update work hours for the respective selected day
+    const daysOfWeekLowerCase = daysOfWeek.map(day => day.toLowerCase());
+  
+    const updatedBhourData = {
+      ...bhourData,
+      workHoursFromOp2: daysOfWeekLowerCase.map(day => updatedAdditionalWorkDays[0]?.from || ""),
+      workHoursToOp2: daysOfWeekLowerCase.map(day => updatedAdditionalWorkDays[0]?.to || ""),
+      workHoursFromOp3: daysOfWeekLowerCase.map(day => updatedAdditionalWorkDays[1]?.from || ""),
+      workHoursToOp3: daysOfWeekLowerCase.map(day => updatedAdditionalWorkDays[1]?.to || ""),
+    };
+  
+    setBhourData(updatedBhourData);
     setAdditionalWorkDays(updatedAdditionalWorkDays);
   };
+  
   const handleAddWork = () => {
     if (additionalWorkDays.length < 2) {
-      setAdditionalWorkDays([...additionalWorkDays, { from: "", to: "" }]);
+      const newWorkDay = { [`${selectedDay.toLowerCase()}WorkHoursFrom`]: "", [`${selectedDay.toLowerCase()}WorkHoursTo`]: "" };
+      setAdditionalWorkDays([...additionalWorkDays, newWorkDay]);
     }
   };
+  
   const handleAdditionalHolidays = (index, field, value) => {
     const updatedAdditionalHolidays = [...additionalHolidays];
     if (field === "delete") {
-      updatedAdditionalHolidays.splice(index, 1); // Remove the selected entry
+      updatedAdditionalHolidays.splice(index, 1);
     } else {
       updatedAdditionalHolidays[index][field] = value;
     }
+  
+    if (index === 0) {
+      // First additional holiday
+      setBhourData((prevData) => ({
+        ...prevData,
+        holidayFromOp2: updatedAdditionalHolidays[0]?.from || "",
+        holidayToOp2: updatedAdditionalHolidays[0]?.to || "",
+      }));
+    } else if (index === 1) {
+      // Second additional holiday
+      setBhourData((prevData) => ({
+        ...prevData,
+        holidayFromOp3: updatedAdditionalHolidays[1]?.from || "",
+        holidayToOp3: updatedAdditionalHolidays[1]?.to || "",
+      }));
+    }
+  
     setAdditionalHolidays(updatedAdditionalHolidays);
   };
+  
   const handleAddHolidays = () => {
     if (additionalHolidays.length < 2) {
-      setAdditionalHolidays([...additionalHolidays, { from: "", to: "" }]);
+      const newHolidays = { from: "", to: "" };
+      setAdditionalHolidays([...additionalHolidays, newHolidays]);
+  
+      if (additionalHolidays.length === 0) {
+        // First addition
+        setBhourData((prevData) => ({
+          ...prevData,
+          holidayFromOp2: newHolidays.from,
+          holidayToOp2: newHolidays.to,
+        }));
+      } else if (additionalHolidays.length === 1) {
+        // Second addition
+        setBhourData((prevData) => ({
+          ...prevData,
+          holidayFromOp3: newHolidays.from,
+          holidayToOp3: newHolidays.to,
+        }));
+      }
     }
   };
+  
   function getCurrentDayIndex() {
     const today = new Date().getDay();
     // Since Sunday is not index 0 in getDay()
     return today === 0 ? 6 : today - 1;
   }
+
+
   const openCurrentDay = () => {
     const currentDayIndex = getCurrentDayIndex();
     const currentDay = daysOfWeek[currentDayIndex];
@@ -218,18 +326,36 @@ function BhourModal({ setOpenModal, onClose }) {
     };
     // console.log("Saved Data:", savedData.workHours);
     setBusinessDataFromModal(
-      savedData
-      //   {
-      //   businessDaysFrom: bhourData.businessDaysFrom,
-      //   businessDaysTo: bhourData.businessDaysTo,
-      //   selectedMode: selectedOption,
-
-      //   // monHours: bhourData.workHours.monWorkHoursFrom || "Default Value", // Use default value if monWorkHoursFrom is undefined
-      // }
-    );
+      savedData);
 
     onClose(true);
   };
+  const isDisabledHolidayOption = (day) => {
+    if (bhourData.businessDaysFrom && bhourData.businessDaysTo) {
+      const businessDaysFromIndex = daysOfWeek.indexOf(bhourData.businessDaysFrom);
+      const businessDaysToIndex = daysOfWeek.indexOf(bhourData.businessDaysTo);
+      const dayIndex = daysOfWeek.indexOf(day);
+      return dayIndex >= businessDaysFromIndex && dayIndex <= businessDaysToIndex;
+    }
+    return false;
+  };
+  const isDisabledHolidayToOption = (day) => {
+    return bhourData.holidayFrom === day;
+  };
+  const timeOptions = [
+    "08:00 AM",
+    "09:00 AM",
+    "09:30 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "01:00 PM",
+    "02:00 PM",
+    "03:00 PM",
+    "04:00 PM",
+    "05:00 PM",
+    "06:00 PM"
+  ];
   
   return (
     <div className="modalContainer">
@@ -238,14 +364,6 @@ function BhourModal({ setOpenModal, onClose }) {
         <img src={hour} alt="hour" className="h-[20px] w-[20px]" />
         <h1>Business Hours</h1>
       </div>
-      {/* <div className="border flex items-center justify-end bg-white rounded-[5px]">
-         
-          Central Time USA and Canada
-          
-         
-
-        </div> */}
-
       <div className="flex items-center justify-start  w-full mr-5 gap-3 mt-5 ">
         <div>
           <label className="inline-flex items-center">
@@ -275,20 +393,16 @@ function BhourModal({ setOpenModal, onClose }) {
             </span>
           </label>
         </div>
-
-        {/* {selectedWeekday && <p>Selected weekday: {selectedWeekday}</p>} */}
       </div>
 
       <TimezoneSelect
         sx={{ height: "5px", backgroundColor: "#FDFBFB" }}
         value={selectedTimezone}
         onChange={setSelectedTimezone}
-        //  placeholder= {"Select Time zone"}
         labelStyle="altName"
         className="text-[14px] w-[390px] shadow-sm mt-2 hover:shadow-md"
       />
       <div className="business_days  max-h-[100px] overflow-y-auto">
-        {/* max-h-[100px] overflow-y-auto */}
 
         <h2>Business Days</h2>
         <div className="select_days flex flex-col">
@@ -297,15 +411,18 @@ function BhourModal({ setOpenModal, onClose }) {
               value={bhourData.businessDaysFrom}
               name="businessDaysFrom"
               onChange={handleChange}
+              className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
             >
               <option value="">Select</option>
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-              <option value="Sunday">Sunday</option>
+              {daysOfWeek.map((day) => (
+                <option
+                  key={day}
+                  value={day}
+                  disabled={bhourData.businessDaysTo === day}
+                >
+                  {day}
+                </option>
+              ))}
             </select>
 
             <p>to</p>
@@ -313,16 +430,20 @@ function BhourModal({ setOpenModal, onClose }) {
               value={bhourData.businessDaysTo}
               onChange={handleChange}
               name="businessDaysTo"
+              className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
             >
               <option value="">Select</option>
-
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-              <option value="Sunday">Sunday</option>
+              {daysOfWeek
+    .filter((day) => daysOfWeek.indexOf(day) > daysOfWeek.indexOf(bhourData.businessDaysFrom))
+    .map((day) => (
+      <option
+        key={day}
+        value={day}
+        disabled={bhourData.businessDaysFrom === day}
+      >
+        {day}
+      </option>
+    ))}
             </select>
           </div>
           {selectedOption === "custom" &&
@@ -341,15 +462,28 @@ function BhourModal({ setOpenModal, onClose }) {
                       e.target.value
                     )
                   }
+                  className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
                 >
                   <option value="">Select</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                  <option value="Sunday">Sunday</option>
+                  {index === 0
+          ? daysOfWeek
+              .slice(daysOfWeek.indexOf(bhourData.businessDaysTo) + 1)
+              .map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))
+          : daysOfWeek
+              .slice(
+                daysOfWeek.indexOf(
+                  additionalBusinessDays[index - 1].to || bhourData.businessDaysTo
+                ) + 1
+              )
+              .map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))}
                 </select>
                 <p>to</p>
                 <select
@@ -362,15 +496,21 @@ function BhourModal({ setOpenModal, onClose }) {
                       e.target.value
                     )
                   }
+                  className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
+
                 >
                   <option value="">Select</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                  <option value="Sunday">Sunday</option>
+                  {daysOfWeek
+          .slice(
+            daysOfWeek.indexOf(
+              additionalBusinessDays[index].from || bhourData.businessDaysFrom
+            ) + 1
+          )
+          .map((day) => (
+            <option key={day} value={day}>
+              {day}
+            </option>
+          ))}
                 </select>
                 <img
                   src={trash}
@@ -389,30 +529,53 @@ function BhourModal({ setOpenModal, onClose }) {
             <img src={add} onClick={handleAddClick} />
           )}
         </div>
-
-        {/* {selectedWeekday && <p>Selected weekday: {selectedWeekday}</p>} */}
       </div>
 
       <div className="days">
         <h2>Days</h2>
         <div className="flex flex-col w-full">
           <div className="button_days">
-            {daysOfWeek.map((day) => (
-              <button
-                key={day}
-                onClick={() => toggleWorkHourAndBreak(day)}
-                className={`day-button ${
-                  isCurrentDay(day) ? "selected-day" : ""
-                } ${clickedDays.includes(day) ? "clicked-day" : ""} ${day === "Sat" || day === "Sun" ? "weekend-day" : ""}`}
-              >
-                {day}
-              </button>
-            ))}
+            {daysOfWeek.map((day) => {
+              const shortDay = day.slice(0, 3); // Get the first three letters of the weekday
+              const isDisabled =
+      (bhourData.businessDaysFrom &&
+      bhourData.businessDaysTo &&
+      daysOfWeek.indexOf(day) >=
+        daysOfWeek.indexOf(bhourData.businessDaysFrom) &&
+      daysOfWeek.indexOf(day) <=
+        daysOfWeek.indexOf(bhourData.businessDaysTo)) ||
+      additionalBusinessDays.some((additionalDay) => {
+        const fromIndex = daysOfWeek.indexOf(additionalDay.from);
+        const toIndex = daysOfWeek.indexOf(additionalDay.to);
+        return (
+          fromIndex <= daysOfWeek.indexOf(day) && daysOfWeek.indexOf(day) <= toIndex
+        );
+      });
+
+              return (
+                <div key={day} className="day_container">
+                  <button
+                    key={day}
+                    onClick={() => toggleWorkHourAndBreak(day)}
+                    className={`day-button ${
+                      isCurrentDay(day) ? "selected-day" : ""
+                    } ${clickedDays.includes(day) ? "clicked-day" : ""} ${
+                      isDisabled ? "" : "disabled-day"
+                    }`}
+                    disabled={!isDisabled}
+                  >
+                    {shortDay}
+                  </button>
+                </div>
+              );
+            })}
           </div>
           <div className="flex items-center ml-[40px]">
             {daysOfWeek.map((day) => (
+              
               <div key={day} className="day_container  ">
                 {selectedDay === day && (
+                
                   <>
                     <div className="work_hours ">
                       <h2> Work Hours</h2>
@@ -421,24 +584,42 @@ function BhourModal({ setOpenModal, onClose }) {
                           value={bhourData[`${day.toLowerCase()}WorkHoursFrom`]}
                           onChange={handleChange}
                           name={`${day.toLowerCase()}WorkHoursFrom`}
+                          className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
+
                         >
                           <option value="">Select</option>
-                          <option value="08:00 AM">08:00 AM</option>
-                          <option value="09:00 AM">09:00 AM</option>
-                          <option value="10:00 AM">10:00 AM</option>
-                          <option value="11:00 AM">11:00 AM</option>
+                          {timeOptions
+    .filter((time) => {
+      const selectedTimeIndex = timeOptions.indexOf(bhourData[`${day.toLowerCase()}WorkHoursFrom`]);
+      const currentTimeIndex = timeOptions.indexOf(time);
+      return selectedTimeIndex <= currentTimeIndex;
+    })
+    .map((time, index) => (
+      <option key={index} value={time}>
+        {time}
+      </option>
+    ))}
                         </select>
                         <p>to</p>
                         <select
                           value={bhourData[`${day.toLowerCase()}WorkHoursTo`]}
                           onChange={handleChange}
                           name={`${day.toLowerCase()}WorkHoursTo`}
+                          className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
+
                         >
                           <option value="">Select</option>
-                          <option value="03:00 PM">03:00 PM</option>
-                          <option value="04:00 PM">04:00 PM</option>
-                          <option value="05:00 PM">05:00 PM</option>
-                          <option value="06:00 AM">06:00 AM</option>
+                          {timeOptions
+    .filter((time) => {
+      const selectedTimeIndex = timeOptions.indexOf(bhourData[`${day.toLowerCase()}WorkHoursFrom`]);
+      const currentTimeIndex = timeOptions.indexOf(time);
+      return selectedTimeIndex < 0 || currentTimeIndex > selectedTimeIndex;
+    })
+    .map((time, index) => (
+      <option key={index} value={time}>
+        {time}
+      </option>
+    ))}
                         </select>
                       </div>
                       {selectedOption === "custom" && (
@@ -451,66 +632,63 @@ function BhourModal({ setOpenModal, onClose }) {
                         />
                       )}
                     </div>
-                    {/* {isDefaultMode ? null :(
-                    
-                   )} */}
                     {selectedOption === "custom" &&
-                      additionalWorkDays.map((data, index) => (
-                        <div
-                          key={index}
-                          className="select_time ml-[126px] mb-[-10px] mt-[10px] flex gap-[12px] items-center pb-[10px]"
-                        >
-                          <select
-                            value={data.from}
-                            name={`additionalWorkDayFrom_${index}`}
-                            onChange={(e) =>
-                              handleAdditionalWorkDay(
-                                index,
-                                "from",
-                                e.target.value
-                              )
-                            }
-                          >
-                            <option value="">Select</option>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                            <option value="Sunday">Sunday</option>
-                          </select>
-                          <p>to</p>
-                          <select
-                            value={data.to}
-                            name={`additionalBusinessDayTo_${index}`}
-                            onChange={(e) =>
-                              handleAdditionalWorkDay(
-                                index,
-                                "to",
-                                e.target.value
-                              )
-                            }
-                          >
-                            <option value="">Select</option>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                            <option value="Sunday">Sunday</option>
-                          </select>
-                          <img
-                            src={trash}
-                            alt="trash"
-                            className=" h-[15px] w-[18px]"
-                            onClick={() =>
-                              handleAdditionalWorkDay(index, "delete")
-                            }
-                          />
-                        </div>
-                      ))}
+  additionalWorkDays.map((data, index) => {
+    const previousRow =
+      index > 0 ? additionalWorkDays[index - 1] : bhourData; // Get data from the previous row if it exists, otherwise use bhourData
+    const selectedTimeTo = previousRow[`${selectedDay.toLowerCase()}WorkHoursTo`];
+
+    return (
+      <div key={index} className="select_time ml-[126px] mb-[-10px] mt-[10px] flex gap-[12px] items-center pb-[10px]">
+        <select
+          value={data[`${selectedDay.toLowerCase()}WorkHoursFrom`]}
+          name={`additionalWorkDayFrom_${index}`}
+          onChange={(e) => handleAdditionalWorkDay(index, `${selectedDay.toLowerCase()}WorkHoursFrom`, e.target.value)}
+          className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
+        >
+          <option value="">Select</option>
+          {timeOptions
+            .filter((time) => {
+              const selectedTimeIndex = timeOptions.indexOf(selectedTimeTo);
+              const currentTimeIndex = timeOptions.indexOf(time);
+              return selectedTimeIndex < 0 || currentTimeIndex > selectedTimeIndex;
+            })
+            .map((time, index) => (
+              <option key={index} value={time}>
+                {time}
+              </option>
+            ))}
+        </select>
+        <p>to</p>
+        <select
+          value={data[`${selectedDay.toLowerCase()}WorkHoursTo`]}
+          name={`additionalWorkDayTo_${index}`}
+          onChange={(e) => handleAdditionalWorkDay(index, `${selectedDay.toLowerCase()}WorkHoursTo`, e.target.value)}
+          className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
+        >
+          <option value="">Select</option>
+          {timeOptions
+            .filter((time) => {
+              const selectedTimeIndex = timeOptions.indexOf(data[`${selectedDay.toLowerCase()}WorkHoursFrom`]);
+              const currentTimeIndex = timeOptions.indexOf(time);
+              return selectedTimeIndex < 0 || currentTimeIndex > selectedTimeIndex;
+            })
+            .map((time, index) => (
+              <option key={index} value={time}>
+                {time}
+              </option>
+            ))}
+        </select>
+        <img
+          src={trash}
+          alt="trash"
+          className="h-[15px] w-[18px]"
+          onClick={() => handleAdditionalWorkDay(index, "delete")}
+        />
+      </div>
+    );
+  })}
+
                     <div className="work_hours">
                       <h2>Break</h2>
                       <div className="select_time ml-[-15px]">
@@ -518,51 +696,69 @@ function BhourModal({ setOpenModal, onClose }) {
                           value={bhourData[`${day.toLowerCase()}BreakFrom`]}
                           onChange={handleChange}
                           name={`${day.toLowerCase()}BreakFrom`}
+                          className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
+
                         >
                           <option value="">Select</option>
-                          <option value="11:00 AM">11:00 AM</option>
-                          <option value="12:00 PM">12:00 PM</option>
-                          <option value="01:00 PM">01:00 PM</option>
-                          <option value="02:00 PM">02:00 PM</option>
+                          {timeOptions.map((time, index) => (
+    <option key={index} value={time}>
+      {time}
+    </option>
+  ))}
                         </select>
                         <p>to</p>
                         <select
                           value={bhourData[`${day.toLowerCase()}BreakTo`]}
                           onChange={handleChange}
                           name={`${day.toLowerCase()}BreakTo`}
+                          className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
+
                         >
                           <option value="">Select</option>
-                          <option value="12:00 PM">12:00 PM</option>
-                          <option value="01:00 PM">01:00 PM</option>
-                          <option value="02:00 PM">02:00 PM</option>
-                          <option value="03:00 PM">03:00 PM</option>
+                          {timeOptions
+    .filter((time) => {
+      // Filter the options based on the selected value in breakFrom
+      const selectedTimeIndex = timeOptions.indexOf(bhourData[`${day.toLowerCase()}BreakFrom`]);
+      const currentTimeIndex = timeOptions.indexOf(time);
+      // Include options that come after the selected value in breakFrom
+      return selectedTimeIndex < 0 || currentTimeIndex > selectedTimeIndex;
+    })
+    .map((time, index) => (
+      <option key={index} value={time}>
+        {time}
+      </option>
+    ))}
                         </select>
                       </div>
                     </div>
                   </>
-                )}
+               )}
               </div>
-            ))}
+             
+                          ))}
           </div>
         </div>
       </div>
       <div className="business_days max-h-[100px] overflow-y-auto">
         <h2>Holidays</h2>
-        <div className="select_days  flex flex-col">
+        <div className="select_days flex flex-col">
           <div className="flex items-center gap-3">
             <select
               value={bhourData.holidayFrom}
               onChange={handleChange}
               name="holidayFrom"
+              className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
             >
               <option value="">Select</option>
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-              <option value="Sunday">Sunday</option>
+  {daysOfWeek.map((day) => (
+    <option
+      key={day}
+      value={day}
+      disabled={isDisabledHolidayOption(day)}
+    >
+      {day}
+    </option>
+  ))}
             </select>
 
             <p>to</p>
@@ -570,15 +766,18 @@ function BhourModal({ setOpenModal, onClose }) {
               value={bhourData.holidayTo}
               onChange={handleChange}
               name="holidayTo"
+              className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
             >
-              <option value="">Select</option>
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-              <option value="Sunday">Sunday</option>
+             <option value="">Select</option>
+  {daysOfWeek.map((day) => (
+    <option
+      key={day}
+      value={day}
+      disabled={isDisabledHolidayOption(day) || isDisabledHolidayToOption(day)}
+    >
+      {day}
+    </option>
+  ))}
             </select>
           </div>
           {selectedOption === "custom" &&
@@ -593,15 +792,18 @@ function BhourModal({ setOpenModal, onClose }) {
                   onChange={(e) =>
                     handleAdditionalHolidays(index, "from", e.target.value)
                   }
+                  className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
+
                 >
                   <option value="">Select</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                  <option value="Sunday">Sunday</option>
+                  {daysOfWeek.map((day) => (
+                <option
+                  key={day}
+                  value={day}
+                >
+                  {day}
+                </option>
+              ))}
                 </select>
                 <p>to</p>
                 <select
@@ -610,15 +812,18 @@ function BhourModal({ setOpenModal, onClose }) {
                   onChange={(e) =>
                     handleAdditionalHolidays(index, "to", e.target.value)
                   }
+                  className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
+
                 >
                   <option value="">Select</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                  <option value="Sunday">Sunday</option>
+                  {daysOfWeek.map((day) => (
+                <option
+                  key={day}
+                  value={day}
+                >
+                  {day}
+                </option>
+              ))}
                 </select>
                 <img
                   src={trash}
@@ -628,45 +833,6 @@ function BhourModal({ setOpenModal, onClose }) {
                 />
               </div>
             ))}
-          {/* {additionalBusinessDays.map((data, index) => (
-          <div key={index} className="select_days ml-7">
-             
-            <select
-              value={data.from}
-              name={`additionalBusinessDayFrom_${index}`}
-              onChange={(e) => handleAdditionalBusinessDayChange(index, "from", e.target.value)}
-            >
-              <option value="">Select</option>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-            <option value="Sunday">Sunday</option>
-            </select>
-            <p>to</p>
-            <select
-              value={data.to}
-              name={`additionalBusinessDayTo_${index}`}
-              onChange={(e) => handleAdditionalBusinessDayChange(index, "to", e.target.value)}
-            >
-              <option value="">Select</option>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-            <option value="Sunday">Sunday</option>
-            </select>
-            <img src={trash} alt="trash" 
-            onClick={() => handleAdditionalBusinessDayChange(index, "delete")}
-            
-          />
-            </div>
-           
-        ))} */}
         </div>
 
         <div className="edit">
@@ -675,13 +841,7 @@ function BhourModal({ setOpenModal, onClose }) {
             onClick={handleAddHolidays}
             className={selectedOption === "default" ? "hidden" : ""}
           />
-          {/* <img
-            src={trash}
-            className={selectedOption === "default" ? "hidden" : ""}
-          /> */}
         </div>
-
-        {/* {selectedWeekday && <p>Selected weekday: {selectedWeekday}</p>} */}
       </div>
 
       <div className="flex items-center justify-end gap-4 mt-5 ">
@@ -698,15 +858,6 @@ function BhourModal({ setOpenModal, onClose }) {
           Cancel
         </button>
       </div>
-      {/* <button
-            onClick={() => {
-              setOpenModal(false);
-            }}
-            id="cancelBtn"
-          >
-            Cancel */}
-      {/* </button> */}
-      {/* <button>Continue</button> */}
     </div>
   );
 }
