@@ -177,6 +177,7 @@ function BhourModal({ setOpenModal, onClose }) {
   
     if (field === "delete") {
       updatedAdditionalBusinessDays.splice(index, 1); // Remove the selected entry
+    
     } else {
       updatedAdditionalBusinessDays[index][field] = value;
     }
@@ -194,7 +195,19 @@ function BhourModal({ setOpenModal, onClose }) {
         businessDaysToOp3: updatedAdditionalBusinessDays[1]?.to || "",
       }));
     }
-  
+  // Update business days from/to in the state
+  const businessDaysFromOp2 = updatedAdditionalBusinessDays[0]?.from || "";
+  const businessDaysToOp2 = updatedAdditionalBusinessDays[0]?.to || "";
+  const businessDaysFromOp3 = updatedAdditionalBusinessDays[1]?.from || "";
+  const businessDaysToOp3 = updatedAdditionalBusinessDays[1]?.to || "";
+
+  setBhourData((prevData) => ({
+    ...prevData,
+    businessDaysFromOp2,
+    businessDaysToOp2,
+    businessDaysFromOp3,
+    businessDaysToOp3,
+  }));
     setAdditionalBusinessDays(updatedAdditionalBusinessDays);
   };
   
@@ -224,6 +237,7 @@ function BhourModal({ setOpenModal, onClose }) {
     };
   
     setBhourData(updatedBhourData);
+    
     setAdditionalWorkDays(updatedAdditionalWorkDays);
   };
   
@@ -257,7 +271,19 @@ function BhourModal({ setOpenModal, onClose }) {
         holidayToOp3: updatedAdditionalHolidays[1]?.to || "",
       }));
     }
-  
+  // Update holidays from/to in the state
+  const holidayFromOp2 = updatedAdditionalHolidays[0]?.from || "";
+  const holidayToOp2 = updatedAdditionalHolidays[0]?.to || "";
+  const holidayFromOp3 = updatedAdditionalHolidays[1]?.from || "";
+  const holidayToOp3 = updatedAdditionalHolidays[1]?.to || "";
+
+  setBhourData((prevData) => ({
+    ...prevData,
+    holidayFromOp2,
+    holidayToOp2,
+    holidayFromOp3,
+    holidayToOp3,
+  }));
     setAdditionalHolidays(updatedAdditionalHolidays);
   };
   
@@ -331,17 +357,39 @@ function BhourModal({ setOpenModal, onClose }) {
     onClose(true);
   };
   const isDisabledHolidayOption = (day) => {
-    if (bhourData.businessDaysFrom && bhourData.businessDaysTo) {
-      const businessDaysFromIndex = daysOfWeek.indexOf(bhourData.businessDaysFrom);
-      const businessDaysToIndex = daysOfWeek.indexOf(bhourData.businessDaysTo);
-      const dayIndex = daysOfWeek.indexOf(day);
-      return dayIndex >= businessDaysFromIndex && dayIndex <= businessDaysToIndex;
-    }
-    return false;
+    const businessDaysFromIndex = daysOfWeek.indexOf(bhourData.businessDaysFrom);
+    const businessDaysToIndex = daysOfWeek.indexOf(bhourData.businessDaysTo);
+    const dayIndex = daysOfWeek.indexOf(day);
+  
+    const isDisabledBusinessDays =
+      bhourData.businessDaysFrom &&
+      bhourData.businessDaysTo &&
+      dayIndex >= businessDaysFromIndex &&
+      dayIndex <= businessDaysToIndex;
+  
+    const isDisabledAdditionalBusinessDays = additionalBusinessDays.some(
+      (additionalDay) => {
+        const fromIndex = daysOfWeek.indexOf(additionalDay.from);
+        const toIndex = daysOfWeek.indexOf(additionalDay.to);
+        return (
+          fromIndex <= dayIndex && dayIndex <= toIndex
+        );
+      }
+    );
+  
+    return isDisabledBusinessDays || isDisabledAdditionalBusinessDays;
   };
+  
   const isDisabledHolidayToOption = (day) => {
-    return bhourData.holidayFrom === day;
+    const isDisabledBusinessDaysTo = bhourData.holidayFrom === day;
+  
+    const isDisabledAdditionalBusinessDaysTo = additionalBusinessDays.some(
+      (additionalDay) => additionalDay.from === day || additionalDay.to === day
+    );
+  
+    return isDisabledBusinessDaysTo || isDisabledAdditionalBusinessDaysTo;
   };
+  
   const timeOptions = [
     "08:00 AM",
     "09:00 AM",
@@ -450,7 +498,7 @@ function BhourModal({ setOpenModal, onClose }) {
             additionalBusinessDays.map((data, index) => (
               <div
                 key={index}
-                className="  ml-[30px] mb-[-10px]  flex gap-[12px] items-center pb-[10px]"
+                className="ml-[30px] mb-[-10px]  flex gap-[12px] items-center pb-[10px]"
               >
                 <select
                   value={data.from}
@@ -462,7 +510,7 @@ function BhourModal({ setOpenModal, onClose }) {
                       e.target.value
                     )
                   }
-                  className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
+                  className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"                  
                 >
                   <option value="">Select</option>
                   {index === 0
@@ -750,15 +798,13 @@ function BhourModal({ setOpenModal, onClose }) {
               className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
             >
               <option value="">Select</option>
-  {daysOfWeek.map((day) => (
-    <option
-      key={day}
-      value={day}
-      disabled={isDisabledHolidayOption(day)}
-    >
-      {day}
-    </option>
-  ))}
+              {daysOfWeek
+    .filter(day => !isDisabledHolidayOption(day))
+    .map(day => (
+      <option key={day} value={day}>
+        {day}
+      </option>
+    ))}
             </select>
 
             <p>to</p>
@@ -769,15 +815,13 @@ function BhourModal({ setOpenModal, onClose }) {
               className="focus:outline-none focus:ring-[0.5px] focus:ring-slate-500"
             >
              <option value="">Select</option>
-  {daysOfWeek.map((day) => (
-    <option
-      key={day}
-      value={day}
-      disabled={isDisabledHolidayOption(day) || isDisabledHolidayToOption(day)}
-    >
-      {day}
-    </option>
-  ))}
+             {daysOfWeek
+    .filter(day => !isDisabledHolidayOption(day) && day !== bhourData.holidayFrom) // Exclude the selected day in holidayFrom
+    .map((day) => (
+              <option key={day} value={day}>
+                {day}
+              </option>
+            ))}
             </select>
           </div>
           {selectedOption === "custom" &&
@@ -796,14 +840,13 @@ function BhourModal({ setOpenModal, onClose }) {
 
                 >
                   <option value="">Select</option>
-                  {daysOfWeek.map((day) => (
-                <option
-                  key={day}
-                  value={day}
-                >
-                  {day}
-                </option>
-              ))}
+                  {daysOfWeek
+    .filter(day => !isDisabledHolidayOption(day) && day !== bhourData.holidayTo) // Exclude the selected day in holidayTo
+    .map((day) => (
+              <option key={day} value={day}>
+                {day}
+              </option>
+            ))}
                 </select>
                 <p>to</p>
                 <select
@@ -816,14 +859,13 @@ function BhourModal({ setOpenModal, onClose }) {
 
                 >
                   <option value="">Select</option>
-                  {daysOfWeek.map((day) => (
-                <option
-                  key={day}
-                  value={day}
-                >
-                  {day}
-                </option>
-              ))}
+                  {daysOfWeek
+    .filter(day => !isDisabledHolidayOption(day) && day !== bhourData.holidayFrom) // Exclude the selected day in holidayFrom
+    .map((day) => (
+              <option key={day} value={day}>
+                {day}
+              </option>
+            ))}
                 </select>
                 <img
                   src={trash}
