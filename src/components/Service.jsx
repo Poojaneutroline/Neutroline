@@ -8,6 +8,7 @@ import Modal from "react-responsive-modal";
 import AddService from "./AddService";
 import AddNewService from "./AddNewService";
 import { AppContext } from "../AppContext";
+import { Link } from "react-router-dom";
 
 import "./service.css";
 
@@ -111,11 +112,14 @@ const Service = () => {
     setEditServiceData(service);
     setAddModal(true);
   };
+
   const handleAddNewService = () => {
     // Reset editServiceData when adding a new service
     setEditServiceData(null);
     setAddModal(true);
   };
+
+  
   return (
     <div>
       <Modal
@@ -199,6 +203,27 @@ const Service = () => {
           <ViewService service={selectedService} onCloseModal={onCloseModal} />
         )}
       </Modal>
+      {!businessDaysFrom && !businessDaysTo && (
+        <Modal
+          open={true} // Set to true to always show the modal when businessDataFromModal is not available
+          onClose={() => alert("Modal closed")} // You can customize the close action
+          center
+          classNames={{
+            overlay: "customOverlay",
+            modal: "customModal",
+            closeButton: "customButton",
+          }}
+        >
+          <div>
+            <p>Data is not received. Please set the business data first.</p>
+            {/* You can add a button or link to navigate to the page where business data can be set */}
+            {/* For example, you can use react-router Link */}
+            <Link to="/set-business-data">
+              <button>Set Business Data</button>
+            </Link>
+          </div>
+        </Modal>
+      )}
       <div className="flex justify-between items-end">
         <h1 className="text-[22px] text-[#0C1A97]  mb-[-5px]">All Services</h1>
         <button

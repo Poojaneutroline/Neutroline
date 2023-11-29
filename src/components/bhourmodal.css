@@ -201,9 +201,9 @@ margin-right: 7px;
      z-index: 1;
 }
 .selected-day {
-  background:#6586ea  !important;
+  background:#53c079  !important;
   color: white !important;
-
+   /* #6586ea  */
 }
 .day-button {
   background-color: #ccd5f2; /* Default background color */

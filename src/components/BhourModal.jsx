@@ -108,14 +108,7 @@ function BhourModal({ setOpenModal, onClose }) {
   const [selectedTimezone, setSelectedTimezone] = useState(
     Intl.DateTimeFormat().resolvedOptions().timeZone
   );
-  const defaultTimezone = "America/New_York"; // Set your default timezone here
-
-  const [data, setData] = useState([
-    {
-      id: 1,
-      visibility: false,
-    },
-  ]);
+  const defaultTimezone = "America/Chicago"; // Set your default timezone here
 
   const [selectedDay, setSelectedDay] = useState("Mon");
 
@@ -160,7 +153,6 @@ function BhourModal({ setOpenModal, onClose }) {
   };
 
   const [additionalBusinessDays, setAdditionalBusinessDays] = useState([]);
-
   const [additionalWorkDays, setAdditionalWorkDays] = useState([]);
   const [additionalHolidays, setAdditionalHolidays] = useState([]);
 
@@ -816,7 +808,7 @@ function BhourModal({ setOpenModal, onClose }) {
             >
              <option value="">Select</option>
              {daysOfWeek
-    .filter(day => !isDisabledHolidayOption(day) && day !== bhourData.holidayFrom) // Exclude the selected day in holidayFrom
+    .filter(day => !isDisabledHolidayOption(day) &&  daysOfWeek.indexOf(day) > daysOfWeek.indexOf(bhourData.holidayFrom)) // Exclude the selected day in holidayFrom
     .map((day) => (
               <option key={day} value={day}>
                 {day}
@@ -840,13 +832,34 @@ function BhourModal({ setOpenModal, onClose }) {
 
                 >
                   <option value="">Select</option>
-                  {daysOfWeek
-    .filter(day => !isDisabledHolidayOption(day) && day !== bhourData.holidayTo) // Exclude the selected day in holidayTo
-    .map((day) => (
-              <option key={day} value={day}>
-                {day}
-              </option>
-            ))}
+        {index === 0
+          ? // If it's the first row, filter based on businessDaysTo
+            daysOfWeek
+              .filter(
+                (day) =>
+                  !isDisabledHolidayOption(day) &&
+                  daysOfWeek.indexOf(day) > daysOfWeek.indexOf(bhourData.holidayTo)
+              )
+              .map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))
+          : // If it's not the first row, filter based on the previous row's "to" value
+            daysOfWeek
+              .filter(
+                (day) =>
+                  !isDisabledHolidayOption(day) &&
+                  daysOfWeek.indexOf(day) >
+                    daysOfWeek.indexOf(
+                      additionalHolidays[index - 1].to || bhourData.holidayTo
+                    )
+              )
+              .map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))}
                 </select>
                 <p>to</p>
                 <select
@@ -860,12 +873,26 @@ function BhourModal({ setOpenModal, onClose }) {
                 >
                   <option value="">Select</option>
                   {daysOfWeek
-    .filter(day => !isDisabledHolidayOption(day) && day !== bhourData.holidayFrom) // Exclude the selected day in holidayFrom
-    .map((day) => (
-              <option key={day} value={day}>
-                {day}
-              </option>
-            ))}
+          .filter(
+            (day) =>
+              !isDisabledHolidayOption(day) &&
+              daysOfWeek.indexOf(day) >
+                daysOfWeek.indexOf(data.from || bhourData.holidayFrom)
+          )
+          .filter(
+            (day) =>
+              daysOfWeek.indexOf(day) >
+              daysOfWeek.indexOf(
+                index === 0
+                  ? bhourData.holidayTo
+                  : additionalHolidays[index - 1].to || bhourData.holidayTo
+              )
+          )
+          .map((day) => (
+            <option key={day} value={day}>
+              {day}
+            </option>
+          ))}
                 </select>
                 <img
                   src={trash}

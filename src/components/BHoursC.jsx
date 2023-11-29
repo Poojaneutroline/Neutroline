@@ -170,6 +170,7 @@ const BhoursC = () => {
               <h2 className="w-[70px] border ">{currentDayData?.workfrom || "From"}</h2>
               <p>-</p>
               <h2 className="w-[70px] border  ">{currentDayData?.workto || "To"}</h2>
+              {businessDataFromModal.workHours && (
               <button onClick={openSModal} className="ml-[-13%] cursor-pointer">
                 <svg
                   width="14"
@@ -187,6 +188,7 @@ const BhoursC = () => {
                   />
                 </svg>
               </button>
+              )}
               {/* <img src={schedule} alt="schedule" 
                onClick={openSModal}
               className="w-[15px] h-[15px] ml-[-50px] cursor-pointer"/> */}
