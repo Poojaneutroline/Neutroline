@@ -153,21 +153,7 @@ const Service = () => {
       </div>
     </div>
     </Modal>
-      <Modal
-        open={addModal}
-        onClose={closeAddModal}
-        center
-        classNames={{
-          overlay: "customOverlay",
-          modal: "customModal",
-          closeButton: "customButton",
-        }}
-      >
-        <AddNewService
-          setServiceDataFromModal={setServiceDataFromModal}
-          setOpenModal={openAddModal}
-          onCloseModal={closeAddModal}        />
-      </Modal>
+     
       {addModal && (
       <Modal
         open={addModal}

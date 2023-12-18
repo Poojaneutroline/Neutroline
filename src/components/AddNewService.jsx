@@ -120,8 +120,8 @@ const AddNewService = ({
       // If customizeHours is not checked, or businessDataFromModal is not defined, set visibility days based on the selected index
       const updatedWeekdays = newService.weekdays.map((weekday, i) => ({
         ...weekday,
-        visibility: i === index,
-        selected: i === index,
+        visibility: i === index ? !weekday.visibility : weekday.visibility,
+        selected: i === index ,
       }));
 
       setNewService((prevState) => ({
@@ -139,7 +139,9 @@ const AddNewService = ({
       ) {
         const updatedWeekdays = newService.weekdays.map((weekday, i) => ({
           ...weekday,
-          visibility: i >= businessDaysFrom && i <= businessDaysTo,
+          // visibility: i >= businessDaysFrom && i <= businessDaysTo,
+          // selected: i === index,
+          visibility: i === index ? !weekday.visibility : weekday.visibility,
           selected: i === index,
         }));
 
@@ -255,7 +257,6 @@ const AddNewService = ({
         }));
       }
     } else {
-      // Handle other inputs
       setNewService((prevState) => ({ ...prevState, [name]: value }));
     }
   };
@@ -313,12 +314,10 @@ const AddNewService = ({
   const handleCustomHoursToggle = () => {
     setUseCustomHours(!useCustomHours);
     if (!useCustomHours) {
-      // Check if businessDataFromModal includes Monday to Friday
       const businessDaysFrom =
         businessDataFromModal.workHours?.businessDaysFrom || "From";
       const businessDaysTo =
         businessDataFromModal.workHours?.businessDaysTo || "To";
-      // Set availability days based on businessDaysFrom and businessDaysTo
       const weekdaysAvailability = newService.weekdays.map(
         (weekday, index) => ({
           ...weekday,
@@ -333,7 +332,6 @@ const AddNewService = ({
         weekdays: weekdaysAvailability,
       }));
     } else {
-      // Clear values when custom hours are enabled
       setNewService((prevService) => ({
         ...prevService,
         option1: "",
@@ -374,26 +372,23 @@ const AddNewService = ({
         weekday.isCustom &&
         weekday.numberOfCustomOptions === 2
       ) {
-        // If all custom options are added, do nothing
         return weekday;
       }
       if (weekday.selected && weekday.isCustom) {
-        // If custom options are already added, add new options to option5 and option6
         return {
           ...weekday,
-          option5: "Select", // Initialize option5 with default value
-          option6: "Select", // Initialize option6 with default value
-          numberOfCustomOptions: weekday.numberOfCustomOptions + 1, // Increment the number of custom options added
+          option5: "Select", 
+          option6: "Select",
+          numberOfCustomOptions: weekday.numberOfCustomOptions + 1,
         };
       }
       if (weekday.selected) {
-        // If custom options are not added yet, add a new pair of options to option3 and option4
         return {
           ...weekday,
-          option3: "Select", // Initialize option3 with default value
-          option4: "Select", // Initialize option4 with default value
-          isCustom: true, // Flag to indicate custom options are added
-          numberOfCustomOptions: 1, // Initialize the number of custom options added to 1
+          option3: "Select", 
+          option4: "Select",
+          isCustom: true,
+          numberOfCustomOptions: 1, 
         };
       }
       return weekday;
@@ -405,33 +400,44 @@ const AddNewService = ({
     }));
   };
 
-  const handleDeleteTime = (weekdayIndex) => {
+  const handleDeleteTime = (index) => {
     setNewService((prevService) => {
-      const updatedWeekdays = [...prevService.weekdays];
-      updatedWeekdays[weekdayIndex].isCustom = false;
-      updatedWeekdays[weekdayIndex].option3 = "";
-      updatedWeekdays[weekdayIndex].option4 = "";
+      const updatedWeekdays = prevService.weekdays.map((weekday, i) => {
+        if (i === index) {
+          return {
+            ...weekday,
+            option3: "Select",
+            option4: "Select",
+            isCustom: false,
+            numberOfCustomOptions: 0,
+          };
+        }
+        return weekday;
+      });
       return {
         ...prevService,
         weekdays: updatedWeekdays,
       };
     });
   };
-  const timeOptions = [
-    "08:00 AM",
-    "09:00 AM",
-    "09:30 AM",
-    "10:00 AM",
-    "11:00 AM",
-    "12:00 PM",
-    "01:00 PM",
-    "02:00 PM",
-    "03:00 PM",
-    "04:00 PM",
-    "05:00 PM",
-    "06:00 PM",
-  ];
+  
 
+  
+
+  
+  // Function to handle deletion of option5 and option6
+const handleDeleteOption56 = (index) => {
+  // Create a copy of the newService object to avoid direct mutation
+  const updatedService = { ...newService };
+  // Set option5 and option6 to null for the specified weekday
+  updatedService.weekdays[index].option5 = null;
+  updatedService.weekdays[index].option6 = null;
+  // Update the state with the modified service object
+  setNewService(updatedService);
+};
+
+  const timeOptions = [ "08:00 AM", "09:00 AM","09:30 AM","10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM", "06:00 PM",
+  ];
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -445,11 +451,9 @@ const AddNewService = ({
       setError("Please set the business hour first.");
     } else {
       setError(null);
-
       if (useCustomHours && businessDataFromModal.workHours) {
         const { businessDaysFrom, businessDaysTo } =
           businessDataFromModal.workHours;
-
         if (
           typeof businessDaysFrom !== "undefined" &&
           typeof businessDaysTo !== "undefined"
@@ -468,7 +472,6 @@ const AddNewService = ({
       }
     }
   }, [useCustomHours, businessDataFromModal]);
-
   return (
     <div>
       {error ? (
@@ -721,6 +724,12 @@ const AddNewService = ({
                                     </option>
                                   ))}
                               </select>
+                              <img
+                            src={trash}
+                            alt="trash"
+                            onClick={() => handleDeleteOption56(index)}
+                            className=" h-[15px] w-[15px] ml-[48px]"
+                          />
                             </>
                           )}
                       </div>
